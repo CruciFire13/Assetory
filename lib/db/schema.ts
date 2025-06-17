@@ -104,3 +104,16 @@ export const sharedAccessRelations = relations(sharedAccess, ({ one }) => ({
     relationName: "shared_with_user",
   }),
 }));
+
+// Type Inference
+export type SelectUser = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+
+export type SelectFolder = typeof folders.$inferSelect;
+export type InsertFolder = typeof folders.$inferInsert;
+
+export type SelectAsset = typeof assets.$inferSelect;
+export type InsertAsset = typeof assets.$inferInsert;
+
+export type SelectSharedAccess = typeof sharedAccess.$inferSelect;
+export type InsertSharedAccess = typeof sharedAccess.$inferInsert;
