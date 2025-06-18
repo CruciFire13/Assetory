@@ -26,7 +26,6 @@ export default function SignUpForm() {
   );
   const [verifying, setVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  const [verificationError, setVerificationError] = useState<string | null>(null);
 
   const {
     register,
@@ -35,6 +34,7 @@ export default function SignUpForm() {
   } = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       passwordConfirmation: "",
@@ -51,6 +51,7 @@ export default function SignUpForm() {
       await signUp.create({
         emailAddress: data.email,
         password: data.password,
+        firstName: data.name,
       });
 
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
@@ -149,6 +150,15 @@ export default function SignUpForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Your Good Name"
+              {...register("name")}
+              disabled={isSubmitting}
+            />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
             <Input
               type="email"
               placeholder="Email"
