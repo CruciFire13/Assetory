@@ -45,3 +45,5 @@ next-env.d.ts
 
 # Drizzle ORM
 drizzle/generated/
+# clerk configuration (can include secrets)
+/.clerk/

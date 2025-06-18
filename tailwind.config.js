@@ -1,14 +1,12 @@
-// tailwind.config.js
-const {heroui} = require("@heroui/theme");
-
-/** @type {import('tailwindcss').Config} */
+ @type {import('tailwindcss').Config}
 module.exports = {
   content: [
-    "./node_modules/@heroui/theme/dist/components/(card|ripple).js",
+    "./app/**/*.{ts,tsx}",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {},
   },
-  darkMode: "class",
-  plugins: [heroui()],
+  plugins: [require("tailwindcss-animate")],
 };
