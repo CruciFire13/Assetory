@@ -26,6 +26,7 @@ export default function SignUpForm() {
   );
   const [verifying, setVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [verificationError, setVerificationError] = useState<string | null>(null);
 
   const {
     register,
