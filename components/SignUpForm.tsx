@@ -17,8 +17,10 @@ export default function SignUpForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-    const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationError, setVerificationError] = useState<string | null>(
+    null
+  );
   // Add resend functionality
   const [isResending, setIsResending] = useState(false);
 
@@ -30,9 +32,9 @@ export default function SignUpForm() {
 
     try {
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      // Clear the current code
+
       setVerificationCode("");
-      // Show success message temporarily
+
       setVerificationError("New verification code sent to your email!");
       setTimeout(() => setVerificationError(null), 3000);
     } catch (error: any) {
@@ -122,23 +124,23 @@ export default function SignUpForm() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -195,7 +197,9 @@ export default function SignUpForm() {
         // More detailed error based on status
         console.log("Verification status:", result.status);
         if (result.status === "missing_requirements") {
-          setVerificationError("Additional verification steps required. Please contact support.");
+          setVerificationError(
+            "Additional verification steps required. Please contact support."
+          );
         } else {
           setVerificationError(
             `Verification incomplete. Status: ${result.status}. Please try again or contact support.`
@@ -204,21 +208,27 @@ export default function SignUpForm() {
       }
     } catch (error: any) {
       console.error("Verification error:", error);
-      
+
       // More specific error handling
       if (error.errors && error.errors.length > 0) {
         const errorCode = error.errors[0].code;
         const errorMessage = error.errors[0].message;
-        
+
         console.log("Error code:", errorCode);
         console.log("Error message:", errorMessage);
-        
+
         if (errorCode === "verification_expired") {
-          setVerificationError("Verification code has expired. Please request a new one.");
+          setVerificationError(
+            "Verification code has expired. Please request a new one."
+          );
         } else if (errorCode === "verification_failed") {
-          setVerificationError("Invalid verification code. Please check and try again.");
+          setVerificationError(
+            "Invalid verification code. Please check and try again."
+          );
         } else {
-          setVerificationError(errorMessage || "An error occurred during verification.");
+          setVerificationError(
+            errorMessage || "An error occurred during verification."
+          );
         }
       } else {
         setVerificationError("An unexpected error occurred. Please try again.");
@@ -251,18 +261,28 @@ export default function SignUpForm() {
                 maxLength={6}
               />
               {verificationError && (
-                <p className={`text-sm ${verificationError.includes("sent") ? "text-green-600" : "text-red-600"}`}>
+                <p
+                  className={`text-sm ${
+                    verificationError.includes("sent")
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {verificationError}
                 </p>
               )}
-              <Button type="submit" disabled={isSubmitting || !verificationCode.trim()} className="w-full">
+              <Button
+                type="submit"
+                disabled={isSubmitting || !verificationCode.trim()}
+                className="w-full"
+              >
                 {isSubmitting ? (
                   <Loader2 className="animate-spin w-4 h-4 mr-2" />
                 ) : (
                   "Verify Email"
                 )}
               </Button>
-              
+
               <div className="text-center">
                 <button
                   type="button"
@@ -270,7 +290,9 @@ export default function SignUpForm() {
                   disabled={isResending || isSubmitting}
                   className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50"
                 >
-                  {isResending ? "Sending..." : "Didn't receive the code? Resend"}
+                  {isResending
+                    ? "Sending..."
+                    : "Didn't receive the code? Resend"}
                 </button>
               </div>
             </form>
@@ -304,7 +326,7 @@ export default function SignUpForm() {
             {errors.name && (
               <p className="text-sm text-red-500">{errors.name}</p>
             )}
-            
+
             <Input
               type="email"
               name="email"
