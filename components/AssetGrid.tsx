@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
 interface Folder {
   id: string;
@@ -21,20 +21,19 @@ interface Asset {
 }
 
 interface Props {
-  currentFolderId: string | null;
-  onFolderClick: (folderId: string) => void;
+  endpoint: string;
+  onFolderClick?: (folderId: string) => void;
+  showBreadcrumbs?: boolean;
 }
 
-const AssetGrid = ({ currentFolderId, onFolderClick }: Props) => {
+const AssetGrid = ({ endpoint, onFolderClick, showBreadcrumbs = false }: Props) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchContents = async () => {
     try {
-      const endpoint = currentFolderId
-        ? `/api/folders/contents/${currentFolderId}`
-        : `/api/folders/root`;
-
+      setLoading(true);
       const res = await fetch(endpoint);
       const data = await res.json();
 
@@ -47,12 +46,14 @@ const AssetGrid = ({ currentFolderId, onFolderClick }: Props) => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to load folder contents");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchContents();
-  }, [currentFolderId]);
+  }, [endpoint]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -62,7 +63,7 @@ const AssetGrid = ({ currentFolderId, onFolderClick }: Props) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={() => onFolderClick(folder.id)}
+          onClick={() => onFolderClick?.(folder.id)}
           className="cursor-pointer"
         >
           <Card className="hover:shadow-lg transition">
@@ -118,9 +119,9 @@ const AssetGrid = ({ currentFolderId, onFolderClick }: Props) => {
         </motion.div>
       ))}
 
-      {folders.length === 0 && assets.length === 0 && (
-        <p className="col-span-full text-gray-500">
-          No folders or assets here.
+      {!loading && folders.length === 0 && assets.length === 0 && (
+        <p className="col-span-full text-gray-500 text-center">
+          No folders or assets found.
         </p>
       )}
     </div>

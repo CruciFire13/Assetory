@@ -36,13 +36,7 @@ export default function DashboardPage() {
             <SignOutClientButton />
           </div>
 
-          <AssetUploader />
-          <FolderCreator />
-
-          <AssetGrid
-            endpoint={currentFolderId ? `/api/folders/contents/${currentFolderId}` : `/api/folders/root`}
-            onFolderClick={(folderId) => setCurrentFolderId(folderId)}
-          />
+          <AssetGrid endpoint="/api/favourite/index" />
         </main>
       </div>
     </div>
