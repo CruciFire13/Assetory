@@ -17,7 +17,7 @@ export const registerUser = async () => {
   // Get the clerk client instance first
   const clerk = await clerkClient();
   const clerkUser = await clerk.users.getUser(userId);
-  
+
   const primaryEmail = clerkUser.emailAddresses.find(
     (email) => email.id === clerkUser.primaryEmailAddressId
   );
