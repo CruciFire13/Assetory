@@ -6,7 +6,7 @@ import { eq, and } from "drizzle-orm";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -14,7 +14,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const folderId = params.id;
+    // Await params before accessing properties
+    const resolvedParams = await params;
+    const folderId = resolvedParams.id;
 
     const [childFolders, childAssets] = await Promise.all([
       db
