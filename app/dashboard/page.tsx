@@ -1,17 +1,26 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
-import { AssetGrid } from "@/components/AssetGrid";
+import AssetGrid from "@/components/AssetGrid";
 import AssetUploader from "@/components/AssetUploader";
 import FolderCreator from "@/components/FolderCreator";
 import SignOutClientButton from "@/components/SignOutClientButton";
 
-export default async function DashboardPage() {
-  const { userId } = await auth();
+export default function DashboardPage() {
+  const { userId } = useAuth();
+  const router = useRouter();
 
-  if (!userId) return redirect("/sign-in");
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+
+  if (!userId) {
+    router.push("/sign-in");
+    return null;
+  }
 
   return (
     <div className="flex h-screen">
@@ -26,7 +35,11 @@ export default async function DashboardPage() {
 
           <AssetUploader />
           <FolderCreator />
-          <AssetGrid />
+
+          <AssetGrid
+            currentFolderId={currentFolderId}
+            onFolderClick={(folderId) => setCurrentFolderId(folderId)}
+          />
         </main>
       </div>
     </div>

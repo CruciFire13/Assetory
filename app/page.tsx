@@ -22,10 +22,10 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <Link href="/SignUp">
+        <Link href="/sign-up">
           <Button variant="default">Sign Up</Button>
         </Link>
-        <Link href="/SignIn">
+        <Link href="/sign-in">
           <Button variant="outline">Sign In</Button>
         </Link>
       </motion.div>

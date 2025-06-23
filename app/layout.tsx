@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,19 +17,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "devAsset hub",
-  description: "",
+  description: "A developer asset hub for managing files and folders.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <ClerkProvider>
+      <Toaster richColors position="top-right" />
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
         >
           {children}
         </body>
