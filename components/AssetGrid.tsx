@@ -98,6 +98,8 @@ const AssetGrid = ({ endpoint, onFolderClick }: Props) => {
               <MoreOptionsMenu
                 onFavorite={() => handleFavorite(folder.id, "folder")}
                 onDelete={() => handleTrash(folder.id, "folder")}
+                itemId={folder.id}
+                itemType="folder"
               />
             </div>
             <CardContent
@@ -128,6 +130,8 @@ const AssetGrid = ({ endpoint, onFolderClick }: Props) => {
               <MoreOptionsMenu
                 onFavorite={() => handleFavorite(asset.id, "asset")}
                 onDelete={() => handleTrash(asset.id, "asset")}
+                itemId={asset.id}
+                itemType="asset"
               />
             </div>
             <CardContent className="p-4">

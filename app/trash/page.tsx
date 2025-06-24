@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
 import AssetGrid from "@/components/AssetGrid";
-import AssetUploader from "@/components/AssetUploader";
-import FolderCreator from "@/components/FolderCreator";
 import SignOutClientButton from "@/components/SignOutClientButton";
 
 export default function DashboardPage() {

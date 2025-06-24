@@ -25,32 +25,29 @@ export default function MoreOptionsMenu({
     const email = prompt("Enter the email to share with:");
     if (!email) return;
 
+    const isAsset = itemType === "asset";
+    const url = isAsset ? "/api/assets/share" : "/api/folders/share";
+
+    const body = isAsset
+      ? { assetId: itemId, sharedWithEmail: email }
+      : { folderId: itemId, sharedWithEmail: email };
+
     try {
-      const res = await fetch(
-        itemType === "asset" ? "/api/assets/share" : "/api/folders/share",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            [`${itemType}Id`]: itemId,
-            sharedWithEmail: email,
-          }),
-        }
-      );
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      toast.success(`Successfully shared ${itemType} with ${email}`);
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      toast.success(`Shared ${itemType} with ${email}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to share");
     }
   };
+
 
   return (
     <DropdownMenu>
