@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import MoreOptionsMenu from "@/components/ui/MoreOptionsMenu";
 
 interface Folder {
   id: string;
@@ -26,7 +27,7 @@ interface Props {
   showBreadcrumbs?: boolean;
 }
 
-const AssetGrid = ({ endpoint, onFolderClick, showBreadcrumbs = false }: Props) => {
+const AssetGrid = ({ endpoint, onFolderClick }: Props) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,33 @@ const AssetGrid = ({ endpoint, onFolderClick, showBreadcrumbs = false }: Props) 
     }
   };
 
+  const handleFavorite = async (id: string, type: "folder" | "asset") => {
+    try {
+      const res = await fetch(
+        `/api/${type === "folder" ? "folders" : "assets"}/favourite/${id}`,
+        { method: "PATCH" }
+      );
+      if (!res.ok) throw new Error();
+      toast.success(`${type === "folder" ? "Folder" : "Asset"} favorited`);
+    } catch {
+      toast.error("Failed to favorite item");
+    }
+  };
+
+  const handleTrash = async (id: string, type: "folder" | "asset") => {
+    try {
+      const res = await fetch(
+        `/api/${type === "folder" ? "folders" : "assets"}/trash/${id}`,
+        { method: "PATCH" }
+      );
+      if (!res.ok) throw new Error();
+      toast.success(`${type === "folder" ? "Folder" : "Asset"} moved to trash`);
+      fetchContents();
+    } catch {
+      toast.error("Failed to move to trash");
+    }
+  };
+
   useEffect(() => {
     fetchContents();
   }, [endpoint]);
@@ -63,11 +91,19 @@ const AssetGrid = ({ endpoint, onFolderClick, showBreadcrumbs = false }: Props) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={() => onFolderClick?.(folder.id)}
           className="cursor-pointer"
         >
-          <Card className="hover:shadow-lg transition">
-            <CardContent className="p-4">
+          <Card className="hover:shadow-lg transition relative">
+            <div className="absolute top-2 right-2 z-10">
+              <MoreOptionsMenu
+                onFavorite={() => handleFavorite(folder.id, "folder")}
+                onDelete={() => handleTrash(folder.id, "folder")}
+              />
+            </div>
+            <CardContent
+              onClick={() => onFolderClick?.(folder.id)}
+              className="p-4"
+            >
               <CardTitle>{folder.name}</CardTitle>
               <p className="text-sm text-muted-foreground">📁 Folder</p>
               {folder.createdAt && (
@@ -87,7 +123,13 @@ const AssetGrid = ({ endpoint, onFolderClick, showBreadcrumbs = false }: Props) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="hover:shadow-lg transition">
+          <Card className="hover:shadow-lg transition relative">
+            <div className="absolute top-2 right-2 z-10">
+              <MoreOptionsMenu
+                onFavorite={() => handleFavorite(asset.id, "asset")}
+                onDelete={() => handleTrash(asset.id, "asset")}
+              />
+            </div>
             <CardContent className="p-4">
               <CardTitle>{asset.name}</CardTitle>
               <p className="text-sm text-muted-foreground">{asset.fileType}</p>

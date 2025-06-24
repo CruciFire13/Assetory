@@ -7,8 +7,7 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
 import AssetGrid from "@/components/AssetGrid";
-import AssetUploader from "@/components/AssetUploader";
-import FolderCreator from "@/components/FolderCreator";
+import PopupUploader from "@/components/PopupUploader";
 import SignOutClientButton from "@/components/SignOutClientButton";
 
 export default function DashboardPage() {
@@ -36,11 +35,14 @@ export default function DashboardPage() {
             <SignOutClientButton />
           </div>
 
-          <AssetUploader />
-          <FolderCreator />
+          <PopupUploader />
 
           <AssetGrid
-            endpoint={currentFolderId ? `/api/folders/contents/${currentFolderId}` : `/api/folders/root`}
+            endpoint={
+              currentFolderId
+                ? `/api/folders/contents/${currentFolderId}`
+                : `/api/folders/root`
+            }
             onFolderClick={(folderId) => setCurrentFolderId(folderId)}
           />
         </main>
