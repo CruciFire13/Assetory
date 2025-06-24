@@ -6,16 +6,52 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Star, Trash2 } from "lucide-react";
+import { MoreVertical, Star, Trash2, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function MoreOptionsMenu({
   onFavorite,
   onDelete,
+  itemId,
+  itemType,
 }: {
   onFavorite: () => void;
   onDelete: () => void;
+  itemId: string;
+  itemType: "asset" | "folder";
 }) {
+  const handleShare = async () => {
+    const email = prompt("Enter the email to share with:");
+    if (!email) return;
+
+    try {
+      const res = await fetch(
+        itemType === "asset" ? "/api/assets/share" : "/api/folders/share",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            [`${itemType}Id`]: itemId,
+            sharedWithEmail: email,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      toast.success(`Successfully shared ${itemType} with ${email}`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to share");
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -36,6 +72,10 @@ export default function MoreOptionsMenu({
           <DropdownMenuItem onClick={onDelete}>
             <Trash2 className="w-4 h-4 mr-2" />
             Move to Trash
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-2" />
+            Share via Email
           </DropdownMenuItem>
         </motion.div>
       </DropdownMenuContent>

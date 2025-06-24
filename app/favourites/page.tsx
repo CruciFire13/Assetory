@@ -7,9 +7,8 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
 import AssetGrid from "@/components/AssetGrid";
-import AssetUploader from "@/components/AssetUploader";
-import FolderCreator from "@/components/FolderCreator";
 import SignOutClientButton from "@/components/SignOutClientButton";
+import PopupUploader from "@/components/PopupUploader";
 
 export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useAuth();

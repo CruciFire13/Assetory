@@ -7,12 +7,16 @@ import { and, eq } from "drizzle-orm";
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { assetId, sharedWithEmail } = await req.json();
 
     if (!assetId || !sharedWithEmail) {
-      return NextResponse.json({ error: "assetId and sharedWithEmail required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "assetId and sharedWithEmail required" },
+        { status: 400 }
+      );
     }
 
     // Look up target user by email
@@ -22,36 +26,45 @@ export async function POST(req: NextRequest) {
       .where(eq(users.email, sharedWithEmail));
 
     if (!targetUser) {
-      return NextResponse.json({ error: "User to share with not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "User to share with not found" },
+        { status: 404 }
+      );
     }
 
     // Check for existing share
     const existing = await db
-        .select()
-        .from(sharedAccess)
-        .where(
+      .select()
+      .from(sharedAccess)
+      .where(
         and(
-            eq(sharedAccess.itemId, assetId),
-            eq(sharedAccess.sharedWith, targetUser.id),
-            eq(sharedAccess.type, "asset")
+          eq(sharedAccess.itemId, assetId),
+          eq(sharedAccess.sharedWith, targetUser.id),
+          eq(sharedAccess.type, "asset")
         )
-        );
-    
+      );
+
     if (existing.length > 0) {
-          return NextResponse.json({ error: "Already shared" }, { status: 409 });
-        }
+      return NextResponse.json({ error: "Already shared" }, { status: 409 });
+    }
 
     // Insert shared access record
-    const sharedAsset = await db.insert(sharedAccess).values({
-      sharedBy: userId,
-      sharedWith: targetUser.id,
-      itemId: assetId,
-      type: "asset",
-    }).returning();
+    const sharedAsset = await db
+      .insert(sharedAccess)
+      .values({
+        sharedBy: userId,
+        sharedWith: targetUser.id,
+        itemId: assetId,
+        type: "asset",
+      })
+      .returning();
 
     return NextResponse.json(sharedAsset[0], { status: 200 });
   } catch (error) {
     console.error("[SHARE_ASSET_ERROR]", error);
-    return NextResponse.json({ error: "Failed to share asset" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to share asset" },
+      { status: 500 }
+    );
   }
 }
