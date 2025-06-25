@@ -40,6 +40,7 @@ export const assets = pgTable("assets", {
   userId: text("user_id").notNull(),
   isFavorite: boolean("is_favorite").default(false),
   isTrashed: boolean("is_trashed").default(false),
+  fileId: text("file_id"), // Added for ImageKit
   createdAt: timestamp("created_at").defaultNow(),
 });
 

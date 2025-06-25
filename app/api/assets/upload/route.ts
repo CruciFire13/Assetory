@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
         fileSize,
         folderId: folderId || null,
         userId,
+        fileId: uploaded.fileId,
       })
       .returning();
   
