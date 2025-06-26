@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import MoreOptionsMenu from "@/components/ui/MoreOptionsMenu";
+import { useRouter } from "next/navigation";
 
 interface Folder {
   id: string;
@@ -23,14 +24,14 @@ interface Asset {
 
 interface Props {
   endpoint: string;
-  onFolderClick?: (folderId: string) => void;
   showBreadcrumbs?: boolean;
 }
 
-const AssetGrid = ({ endpoint, onFolderClick }: Props) => {
+const AssetGrid = ({ endpoint }: Props) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const fetchContents = async () => {
     try {
@@ -93,19 +94,20 @@ const AssetGrid = ({ endpoint, onFolderClick }: Props) => {
           transition={{ duration: 0.3 }}
           className="cursor-pointer"
         >
-          <Card className="hover:shadow-lg transition relative">
+          <Card
+            className="hover:shadow-lg transition relative"
+            onClick={() => router.push(`/dashboard/folder/${folder.id}`)}
+          >
             <div className="absolute top-2 right-2 z-10">
               <MoreOptionsMenu
                 onFavorite={() => handleFavorite(folder.id, "folder")}
                 onDelete={() => handleTrash(folder.id, "folder")}
                 itemId={folder.id}
                 itemType="folder"
+                itemName={folder.name}
               />
             </div>
-            <CardContent
-              onClick={() => onFolderClick?.(folder.id)}
-              className="p-4"
-            >
+            <CardContent className="p-4">
               <CardTitle>{folder.name}</CardTitle>
               <p className="text-sm text-muted-foreground">📁 Folder</p>
               {folder.createdAt && (
@@ -132,6 +134,7 @@ const AssetGrid = ({ endpoint, onFolderClick }: Props) => {
                 onDelete={() => handleTrash(asset.id, "asset")}
                 itemId={asset.id}
                 itemType="asset"
+                itemName={asset.name}
               />
             </div>
             <CardContent className="p-4">

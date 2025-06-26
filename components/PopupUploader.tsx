@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,19 +12,28 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-
 import ButtonCardInput from "@/components/ui/ButtonCardInput";
 
 const MAX_FILE_SIZE_MB = 5;
 
-export default function PopupUploader() {
+interface PopupUploaderProps {
+  defaultParentId?: string;
+}
+
+export default function PopupUploader({
+  defaultParentId = "",
+}: PopupUploaderProps) {
   const { getToken } = useAuth();
 
   const [file, setFile] = useState<File | null>(null);
-  const [folderId, setFolderId] = useState("");
-
+  const [folderId, setFolderId] = useState(defaultParentId);
   const [folderName, setFolderName] = useState("");
-  const [parentId, setParentId] = useState("");
+  const [parentId, setParentId] = useState(defaultParentId);
+
+  useEffect(() => {
+    setFolderId(defaultParentId);
+    setParentId(defaultParentId);
+  }, [defaultParentId]);
 
   const handleUpload = async () => {
     if (!file) return toast.error("No file selected");
@@ -67,7 +76,7 @@ export default function PopupUploader() {
     if (res.ok) {
       toast.success("Folder Created!");
     } else {
-      toast.error(data.error || "Error creating Folder!");
+      toast.error(data.error || "Error creating folder!");
     }
   };
 
@@ -94,6 +103,7 @@ export default function PopupUploader() {
               <TabsTrigger value="folder">Create Folder</TabsTrigger>
             </TabsList>
 
+            {/* Upload Asset Tab */}
             <TabsContent value="upload" className="space-y-4">
               <ButtonCardInput
                 label="Choose File"
@@ -116,6 +126,7 @@ export default function PopupUploader() {
               </button>
             </TabsContent>
 
+            {/* Create Folder Tab */}
             <TabsContent value="folder" className="space-y-4">
               <ButtonCardInput
                 label="Folder Name"

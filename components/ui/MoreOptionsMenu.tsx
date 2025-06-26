@@ -6,23 +6,73 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Star, Trash2, Share2 } from "lucide-react";
+import {
+  MoreVertical,
+  Star,
+  Trash2,
+  Share2,
+  Pencil,
+  Eye,
+  Download,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import ShareModal from "@/components/ui/ShareModal";
+import { toast } from "sonner";
 
 export default function MoreOptionsMenu({
   onFavorite,
   onDelete,
   itemId,
   itemType,
+  itemName,
 }: {
   onFavorite: () => void;
   onDelete: () => void;
   itemId: string;
   itemType: "asset" | "folder";
+  itemName?: string;
 }) {
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
+
+  const handleRename = async () => {
+    const newName = prompt("Enter new name", itemName);
+    if (!newName || newName === itemName) return;
+
+    const url =
+      itemType === "asset" ? "/api/assets/rename" : "/api/folders/rename";
+    const payload =
+      itemType === "asset"
+        ? { assetId: itemId, newName }
+        : { folderId: itemId, newName };
+
+    try {
+      const res = await fetch(url, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Failed to rename");
+
+      toast.success(`Renamed ${itemType} successfully`);
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong");
+    }
+  };
+
+  const handleDownload = () => {
+    const downloadUrl = `/api/${itemType}s/download/${itemId}`;
+    window.open(downloadUrl, "_blank");
+  };
+
+  const handleOpen = () => {
+    if (itemType === "folder") {
+      router.push(`/dashboard/folder/${itemId}`);
+    }
+  };
 
   return (
     <>
@@ -49,6 +99,20 @@ export default function MoreOptionsMenu({
             <DropdownMenuItem onClick={() => setShowModal(true)}>
               <Share2 className="w-4 h-4 mr-2" />
               Share via Email
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleRename}>
+              <Pencil className="w-4 h-4 mr-2" />
+              Rename
+            </DropdownMenuItem>
+            {itemType === "folder" && (
+              <DropdownMenuItem onClick={handleOpen}>
+                <Eye className="w-4 h-4 mr-2" />
+                Open
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onClick={handleDownload}>
+              <Download className="w-4 h-4 mr-2" />
+              Download
             </DropdownMenuItem>
           </motion.div>
         </DropdownMenuContent>
