@@ -8,7 +8,6 @@ import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
 import AssetGrid from "@/components/AssetGrid";
 import SignOutClientButton from "@/components/SignOutClientButton";
-import PopupUploader from "@/components/PopupUploader";
 
 export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useAuth();
