@@ -24,15 +24,19 @@ import { toast } from "sonner";
 export default function MoreOptionsMenu({
   onFavorite,
   onDelete,
+  onDownload,
   itemId,
   itemType,
   itemName,
+  isFavorite,
 }: {
   onFavorite: () => void;
   onDelete: () => void;
+  onDownload?: () => void;
   itemId: string;
   itemType: "asset" | "folder";
   itemName?: string;
+  isFavorite?: boolean;
 }) {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
@@ -64,8 +68,11 @@ export default function MoreOptionsMenu({
   };
 
   const handleDownload = () => {
-    const downloadUrl = `/api/${itemType}s/download/${itemId}`;
-    window.open(downloadUrl, "_blank");
+    if (itemType === "asset" && onDownload) {
+      onDownload(); // ✅ Trigger fullscreen view in AssetGrid
+    } else {
+      window.open(`/dashboard/${itemType}/${itemId}`, "_blank");
+    }
   };
 
   const handleOpen = () => {
@@ -90,8 +97,9 @@ export default function MoreOptionsMenu({
           >
             <DropdownMenuItem onClick={onFavorite}>
               <Star className="w-4 h-4 mr-2" />
-              Favorite
+              {isFavorite ? "Unfavorite" : "Favorite"}
             </DropdownMenuItem>
+
             <DropdownMenuItem onClick={onDelete}>
               <Trash2 className="w-4 h-4 mr-2" />
               Move to Trash
@@ -110,10 +118,12 @@ export default function MoreOptionsMenu({
                 Open
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onClick={handleDownload}>
-              <Download className="w-4 h-4 mr-2" />
-              Download
-            </DropdownMenuItem>
+            {itemType === "asset" && (
+              <DropdownMenuItem onClick={handleDownload}>
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </DropdownMenuItem>
+            )}
           </motion.div>
         </DropdownMenuContent>
       </DropdownMenu>
