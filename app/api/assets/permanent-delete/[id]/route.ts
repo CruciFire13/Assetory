@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { assets } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { assets, users } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { deleteFromImageKit } from "@/lib/imagekit";
 
 export async function DELETE(
@@ -27,7 +27,17 @@ export async function DELETE(
       await deleteFromImageKit(asset.fileId);
     }
 
+    let storageFreed = 0;
+    storageFreed = asset.fileSize;
+
     await db.delete(assets).where(eq(assets.id, assetId));
+
+    await db
+    .update(users)
+    .set({
+      storageUsed: sql`GREATEST(${users.storageUsed} - ${storageFreed}, 0)`
+    })
+    .where(eq(users.id, userId));
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
