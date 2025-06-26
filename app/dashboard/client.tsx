@@ -15,12 +15,30 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [currentFolderName, setCurrentFolderName] = useState<string>("Root");
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
     }
   }, [isLoaded, isSignedIn, router]);
+
+  const handleFolderClick = (folderId: string, folderName: string) => {
+    setCurrentFolderId(folderId);
+    setCurrentFolderName(folderName);
+  };
+
+  const handleGoBack = () => {
+    // Reset to root folder
+    // setCurrentFolderId(null);
+    // setCurrentFolderName("Root");
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/dashboard");
+    }
+
+  };
 
   if (!isLoaded) return null;
 
@@ -35,7 +53,25 @@ export default function DashboardPage() {
             <SignOutClientButton />
           </div>
 
-          <PopupUploader />
+          {/* Folder Info & Back Button */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              {currentFolderId && (
+                <button
+                  onClick={handleGoBack}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  ← Back
+                </button>
+              )}
+              <h2 className="text-lg font-semibold">{currentFolderName}</h2>
+            </div>
+
+            <PopupUploader
+              defaultParentName={currentFolderId ? currentFolderName : ""}
+              key={currentFolderId} // force re-render when folder changes
+            />
+          </div>
 
           <AssetGrid
             endpoint={
@@ -43,7 +79,7 @@ export default function DashboardPage() {
                 ? `/api/folders/contents/${currentFolderId}`
                 : `/api/folders/root`
             }
-            onFolderClick={(folderId) => setCurrentFolderId(folderId)}
+            onFolderClick={handleFolderClick}
           />
         </main>
       </div>

@@ -1,32 +1,15 @@
-import AssetGrid from "@/components/AssetGrid";
-import PopupUploader from "@/components/PopupUploader";
-import { Sidebar } from "@/components//Sidebar";
-import { Navbar } from "@/components//Navbar";
+// app/dashboard/folder/[id]/page.tsx
+import { use } from "react";
+import FolderPageClient from "@/components/FolderPageClient";
+
 interface FolderPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function FolderPage({ params }: FolderPageProps) {
-  const folderId = params.id;
+  const { id } = use(params); // unwraps the async `params`
 
-  return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-
-      <div className="flex flex-col flex-1">
-        <Navbar />
-
-        <main className="p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Folder Contents</h1>
-            <PopupUploader defaultParentId={folderId} />
-          </div>
-
-          <AssetGrid endpoint={`/api/folders/contents/${folderId}`} />
-        </main>
-      </div>
-    </div>
-  );
+  return <FolderPageClient folderId={id} />;
 }

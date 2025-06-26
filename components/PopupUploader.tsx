@@ -17,79 +17,103 @@ import ButtonCardInput from "@/components/ui/ButtonCardInput";
 const MAX_FILE_SIZE_MB = 5;
 
 interface PopupUploaderProps {
-  defaultParentId?: string;
+  defaultParentName?: string;
 }
 
 export default function PopupUploader({
-  defaultParentId = "",
+  defaultParentName = "",
 }: PopupUploaderProps) {
   const { getToken } = useAuth();
 
   const [file, setFile] = useState<File | null>(null);
-  const [folderId, setFolderId] = useState(defaultParentId);
-  const [folderName, setFolderName] = useState("");
-  const [parentId, setParentId] = useState(defaultParentId);
+  const [targetFolderName, setTargetFolderName] = useState(defaultParentName);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [parentName, setParentName] = useState(defaultParentName);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
 
   useEffect(() => {
-    setFolderId(defaultParentId);
-    setParentId(defaultParentId);
-  }, [defaultParentId]);
+    setTargetFolderName(defaultParentName);
+    setParentName(defaultParentName);
+  }, [defaultParentName]);
 
   const handleUpload = async () => {
     if (!file) return toast.error("No file selected");
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024)
       return toast.error("File exceeds 5MB limit");
 
-    const token = await getToken();
-    const formData = new FormData();
-    formData.append("file", file);
-    if (folderId) formData.append("folderId", folderId);
+    setIsUploading(true);
 
-    const res = await fetch("/api/assets/upload", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append("file", file);
+      if (targetFolderName) formData.append("folderName", targetFolderName);
 
-    const data = await res.json();
-    if (res.ok) {
-      toast.success("File uploaded!");
-    } else {
-      toast.error(data.error || "Upload failed");
+      const res = await fetch("/api/assets/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("File uploaded successfully!");
+        setFile(null);
+        // Reset file input
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+      } else {
+        toast.error(data.error || "Upload failed");
+      }
+    } catch (error) {
+      toast.error("Upload failed");
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleCreateFolder = async () => {
-    if (!folderName) return toast.error("Folder name is required");
+    if (!newFolderName.trim()) return toast.error("Folder name is required");
 
-    const token = await getToken();
-    const res = await fetch("/api/folders/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: folderName, parentId: parentId || null }),
-    });
+    setIsCreatingFolder(true);
 
-    const data = await res.json();
-    if (res.ok) {
-      toast.success("Folder Created!");
-    } else {
-      toast.error(data.error || "Error creating folder!");
+    try {
+      const token = await getToken();
+      const res = await fetch("/api/folders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          name: newFolderName.trim(), 
+          parentName: parentName || null 
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Folder created successfully!");
+        setNewFolderName("");
+      } else {
+        toast.error(data.error || "Error creating folder");
+      }
+    } catch (error) {
+      toast.error("Error creating folder");
+    } finally {
+      setIsCreatingFolder(false);
     }
   };
 
   return (
     <Dialog>
-      <DialogTrigger className="bg-primary text-white px-4 py-2 rounded shadow">
+      <DialogTrigger className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary/90 transition-colors">
         + Add New
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <div className="text-xl font-semibold">
-            <DialogTitle>Manage Assets</DialogTitle>
-          </div>
+          <DialogTitle>Manage Assets</DialogTitle>
         </DialogHeader>
 
         <motion.div
@@ -111,18 +135,28 @@ export default function PopupUploader({
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
 
+              {file && (
+                <div className="p-3 bg-muted rounded-md border text-sm">
+                  <div className="font-medium">{file.name}</div>
+                  <div className="text-muted-foreground">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </div>
+                </div>
+              )}
+
               <ButtonCardInput
-                label="Target Folder ID (optional)"
-                placeholder="Enter Folder ID"
-                value={folderId}
-                onChange={(e) => setFolderId(e.target.value)}
+                label="Target Folder Name (optional)"
+                placeholder="Enter target folder name"
+                value={targetFolderName}
+                onChange={(e) => setTargetFolderName(e.target.value)}
               />
 
               <button
                 onClick={handleUpload}
-                className="w-full bg-green-600 hover:bg-green-700 transition text-white py-2 rounded shadow"
+                disabled={!file || isUploading}
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors text-white py-2 rounded shadow"
               >
-                Upload
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </TabsContent>
 
@@ -130,23 +164,24 @@ export default function PopupUploader({
             <TabsContent value="folder" className="space-y-4">
               <ButtonCardInput
                 label="Folder Name"
-                placeholder="Enter Folder Name"
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
+                placeholder="Enter folder name"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
               />
 
               <ButtonCardInput
-                label="Parent Folder ID (optional)"
-                placeholder="Enter Parent Folder ID"
-                value={parentId}
-                onChange={(e) => setParentId(e.target.value)}
+                label="Parent Folder Name (optional)"
+                placeholder="Enter parent folder name"
+                value={parentName}
+                onChange={(e) => setParentName(e.target.value)}
               />
 
               <button
                 onClick={handleCreateFolder}
-                className="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-2 rounded shadow"
+                disabled={!newFolderName.trim() || isCreatingFolder}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors text-white py-2 rounded shadow"
               >
-                Create Folder
+                {isCreatingFolder ? "Creating..." : "Create Folder"}
               </button>
             </TabsContent>
           </Tabs>
