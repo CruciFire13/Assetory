@@ -14,62 +14,56 @@ import {
   Pencil,
   Eye,
   Download,
+  ArrowLeft,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ShareModal from "@/components/ui/ShareModal";
+import RenameModal from "@/components/ui/renameModal";
 import { toast } from "sonner";
 
 export default function MoreOptionsMenu({
   onFavorite,
   onDelete,
   onDownload,
+  onRestore,
+  onPermanentDelete,
   itemId,
   itemType,
   itemName,
   isFavorite,
+  allowedActions = ["favorite", "delete", "rename", "share", "open", "download"],
+  onRenamed,
 }: {
-  onFavorite: () => void;
-  onDelete: () => void;
+  onFavorite?: () => void;
+  onDelete?: () => void;
   onDownload?: () => void;
+  onRestore?: () => void;
+  onPermanentDelete?: () => void;
   itemId: string;
   itemType: "asset" | "folder";
   itemName?: string;
   isFavorite?: boolean;
+  allowedActions?: Array<
+    | "favorite"
+    | "delete"
+    | "share"
+    | "rename"
+    | "open"
+    | "download"
+    | "restore"
+    | "permanentDelete"
+  >;
+  onRenamed?: () => void;
 }) {
-  const [showModal, setShowModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false);
   const router = useRouter();
-
-  const handleRename = async () => {
-    const newName = prompt("Enter new name", itemName);
-    if (!newName || newName === itemName) return;
-
-    const url =
-      itemType === "asset" ? "/api/assets/rename" : "/api/folders/rename";
-    const payload =
-      itemType === "asset"
-        ? { assetId: itemId, newName }
-        : { folderId: itemId, newName };
-
-    try {
-      const res = await fetch(url, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Failed to rename");
-
-      toast.success(`Renamed ${itemType} successfully`);
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
-    }
-  };
 
   const handleDownload = () => {
     if (itemType === "asset" && onDownload) {
-      onDownload(); // ✅ Trigger fullscreen view in AssetGrid
+      onDownload();
     } else {
       window.open(`/dashboard/${itemType}/${itemId}`, "_blank");
     }
@@ -95,30 +89,56 @@ export default function MoreOptionsMenu({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <DropdownMenuItem onClick={onFavorite}>
-              <Star className="w-4 h-4 mr-2" />
-              {isFavorite ? "Unfavorite" : "Favorite"}
-            </DropdownMenuItem>
+            {allowedActions.includes("favorite") && (
+              <DropdownMenuItem onClick={onFavorite}>
+                <Star className="w-4 h-4 mr-2" />
+                {isFavorite ? "Unfavorite" : "Favorite"}
+              </DropdownMenuItem>
+            )}
 
-            <DropdownMenuItem onClick={onDelete}>
-              <Trash2 className="w-4 h-4 mr-2" />
-              Move to Trash
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowModal(true)}>
-              <Share2 className="w-4 h-4 mr-2" />
-              Share via Email
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleRename}>
-              <Pencil className="w-4 h-4 mr-2" />
-              Rename
-            </DropdownMenuItem>
-            {itemType === "folder" && (
+            {allowedActions.includes("delete") && (
+              <DropdownMenuItem onClick={onDelete}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Move to Trash
+              </DropdownMenuItem>
+            )}
+
+            {allowedActions.includes("restore") && (
+              <DropdownMenuItem onClick={onRestore}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Restore
+              </DropdownMenuItem>
+            )}
+
+            {allowedActions.includes("permanentDelete") && (
+              <DropdownMenuItem onClick={onPermanentDelete}>
+                <Trash2 className="w-4 h-4 mr-2 text-red-500" />
+                Delete Permanently
+              </DropdownMenuItem>
+            )}
+
+            {allowedActions.includes("share") && itemType === "asset" && (
+              <DropdownMenuItem onClick={() => setShowShareModal(true)}>
+                <Share2 className="w-4 h-4 mr-2" />
+                Share via Email
+              </DropdownMenuItem>
+            )}
+
+            {allowedActions.includes("rename") && (
+              <DropdownMenuItem onClick={() => setShowRenameModal(true)}>
+                <Pencil className="w-4 h-4 mr-2" />
+                Rename
+              </DropdownMenuItem>
+            )}
+
+            {allowedActions.includes("open") && itemType === "folder" && (
               <DropdownMenuItem onClick={handleOpen}>
                 <Eye className="w-4 h-4 mr-2" />
                 Open
               </DropdownMenuItem>
             )}
-            {itemType === "asset" && (
+
+            {allowedActions.includes("download") && itemType === "asset" && (
               <DropdownMenuItem onClick={handleDownload}>
                 <Download className="w-4 h-4 mr-2" />
                 Download
@@ -129,10 +149,19 @@ export default function MoreOptionsMenu({
       </DropdownMenu>
 
       <ShareModal
-        open={showModal}
-        onClose={() => setShowModal(false)}
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
         itemId={itemId}
         itemType={itemType}
+      />
+
+      <RenameModal
+        open={showRenameModal}
+        onClose={() => setShowRenameModal(false)}
+        itemId={itemId}
+        itemType={itemType}
+        currentName={itemName || ""}
+        onRenamed={onRenamed || (() => toast.success("Rename complete!"))}
       />
     </>
   );

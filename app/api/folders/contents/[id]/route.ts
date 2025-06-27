@@ -18,6 +18,26 @@ export async function GET(
     const resolvedParams = await params;
     const folderId = resolvedParams.id;
 
+    // Get the folder info first
+    const [folderInfo] = await db
+      .select()
+      .from(folders)
+      .where(
+        and(
+          eq(folders.id, folderId),
+          eq(folders.userId, userId),
+          eq(folders.isTrashed, false)
+        )
+      )
+      .limit(1);
+
+    if (!folderInfo) {
+      return NextResponse.json(
+        { error: "Folder not found" },
+        { status: 404 }
+      );
+    }
+
     const [childFolders, childAssets] = await Promise.all([
       db
         .select()
@@ -43,6 +63,12 @@ export async function GET(
 
     return NextResponse.json(
       {
+        // Include folder info
+        id: folderInfo.id,
+        name: folderInfo.name,
+        parentId: folderInfo.parentId,
+        createdAt: folderInfo.createdAt,
+        // Include contents
         folders: childFolders,
         assets: childAssets,
       },

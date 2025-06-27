@@ -61,10 +61,6 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
     }
   };
 
-  const handleFolderClick = (clickedFolderId: string, folderName: string) => {
-    router.push(`/dashboard/folder/${clickedFolderId}`);
-  };
-
   if (!isLoaded || loading) {
     return (
       <div className="flex h-screen">
@@ -146,7 +142,6 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
 
           <AssetGrid
             endpoint={`/api/folders/contents/${folderId}`}
-            onFolderClick={handleFolderClick}
           />
         </main>
       </div>

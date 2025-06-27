@@ -28,17 +28,6 @@ export default function DashboardPage() {
     setCurrentFolderName(folderName);
   };
 
-  const handleGoBack = () => {
-    // Reset to root folder
-    // setCurrentFolderId(null);
-    // setCurrentFolderName("Root");
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/dashboard");
-    }
-
-  };
 
   if (!isLoaded) return null;
 
@@ -56,14 +45,6 @@ export default function DashboardPage() {
           {/* Folder Info & Back Button */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              {currentFolderId && (
-                <button
-                  onClick={handleGoBack}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  ← Back
-                </button>
-              )}
               <h2 className="text-lg font-semibold">{currentFolderName}</h2>
             </div>
 
@@ -79,7 +60,6 @@ export default function DashboardPage() {
                 ? `/api/folders/contents/${currentFolderId}`
                 : `/api/folders/root`
             }
-            onFolderClick={handleFolderClick}
           />
         </main>
       </div>
