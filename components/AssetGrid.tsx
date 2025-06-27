@@ -8,6 +8,20 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import MoreOptionsMenu from "@/components/ui/MoreOptionsMenu";
 import { useRouter } from "next/navigation";
 
+import {
+  FaJs,
+  FaReact,
+  FaFilePdf,
+  FaFileAlt,
+  FaFileImage,
+  FaFileVideo,
+  FaFileCode,
+  FaFileArchive,
+} from "react-icons/fa";
+import { PiFileCppFill } from "react-icons/pi";
+import { SiTypescript, SiJson, SiPython } from "react-icons/si";
+import { IconType } from "react-icons";
+
 interface Folder {
   id: string;
   name: string;
@@ -57,11 +71,9 @@ const AssetGrid = ({
   const [enlargedAsset, setEnlargedAsset] = useState<Asset | null>(null);
   const router = useRouter();
 
-  // ✅ FIX: Add proper type annotation to defaultActions
-  const defaultActions: Props["allowedActions"] =
-    isTrashPage
-      ? ["restore", "permanentDelete"]
-      : ["favorite", "delete", "rename", "share", "open", "download"];
+  const defaultActions: Props["allowedActions"] = isTrashPage
+    ? ["restore", "permanentDelete"]
+    : ["favorite", "delete", "rename", "share", "open", "download"];
 
   const actions = allowedActions || defaultActions;
 
@@ -173,162 +185,229 @@ const AssetGrid = ({
     );
   }
 
+  const getIconForAsset = (asset: Asset): IconType => {
+    const extension = asset.name.split(".").pop()?.toLowerCase() || "";
+
+    if (asset.fileType.startsWith("image/")) return FaFileImage;
+    if (asset.fileType.startsWith("video/")) return FaFileVideo;
+    if (asset.fileType === "application/pdf") return FaFilePdf;
+
+    switch (extension) {
+      case "js":
+      case "jsx":
+        return FaJs;
+      case "ts":
+      case "tsx":
+        return SiTypescript;
+      case "json":
+        return SiJson;
+      case "cpp":
+        return PiFileCppFill;
+      case "py":
+        return SiPython;
+      case "zip":
+      case "rar":
+      case "tar":
+        return FaFileArchive;
+      case "md":
+      case "txt":
+        return FaFileAlt;
+      default:
+        return FaFileCode;
+    }
+  };
+
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* FOLDERS */}
-        {folders.map((folder) => (
-          <motion.div
-            key={folder.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className={actions.includes("open") ? "cursor-pointer" : ""}
-          >
-            <Card
-              className="hover:shadow-lg transition-all relative group"
-              onDoubleClick={() => handleFolderClick(folder)}
-            >
-              <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                <MoreOptionsMenu
-                  itemId={folder.id}
-                  itemType="folder"
-                  itemName={folder.name}
-                  isFavorite={folder.isFavorite}
-                  onFavorite={() => handleToggleFavorite(folder.id, "folder")}
-                  onDelete={() => handleTrash(folder.id, "folder")}
-                  onRestore={() => handleRestore(folder.id, "folder")}
-                  onPermanentDelete={() =>
-                    handlePermanentDelete(folder.id, "folder")
-                  }
-                  allowedActions={actions}
-                />
-              </div>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">📁</span>
-                  <CardTitle className="truncate flex-1">
-                    {folder.name}
-                  </CardTitle>
-                  {folder.isFavorite && (
-                    <span className="text-yellow-500 text-sm">⭐</span>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground">Folder</p>
-                {isSharedPage && folder.sharedByName && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Shared by: {folder.sharedByName} ({folder.sharedByEmail})
-                  </p>
-                )}
-                {folder.createdAt && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    Created: {new Date(folder.createdAt).toLocaleDateString()}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-
-        {/* ASSETS */}
-        {assets.map((asset) => {
-          const extension = asset.name.split(".").pop()?.toLowerCase() || "";
-          let icon = "📎";
-          let fileLabel = asset.fileType;
-
-          if (asset.fileType.startsWith("image/")) icon = "🖼️";
-          else if (asset.fileType.startsWith("video/")) icon = "🎥";
-          else if (asset.fileType === "application/pdf") icon = "📄";
-          else if (["js", "jsx"].includes(extension)) icon = "📜";
-          else if (["ts", "tsx"].includes(extension)) icon = "📘";
-          else if (extension === "cpp") icon = "⚙️";
-
-          return (
-            <motion.div
-              key={asset.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="hover:shadow-lg transition-all relative group">
-                <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <MoreOptionsMenu
-                    itemId={asset.id}
-                    itemType="asset"
-                    itemName={asset.name}
-                    isFavorite={asset.isFavorite}
-                    onFavorite={() => handleToggleFavorite(asset.id, "asset")}
-                    onDelete={() => handleTrash(asset.id, "asset")}
-                    onDownload={() => window.open(asset.url, "_blank")}
-                    onRestore={() => handleRestore(asset.id, "asset")}
-                    onPermanentDelete={() =>
-                      handlePermanentDelete(asset.id, "asset")
-                    }
-                    allowedActions={actions}
-                  />
-                </div>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">{icon}</span>
-                    <CardTitle className="truncate flex-1">
-                      {asset.name}
-                    </CardTitle>
-                    {asset.isFavorite && (
-                      <span className="text-yellow-500 text-sm">⭐</span>
-                    )}
+      {/* FOLDERS SECTION */}
+      {folders.length > 0 && (
+        <div className="col-span-full mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Folders</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {folders.map((folder) => (
+              <motion.div
+                key={folder.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={actions.includes("open") ? "cursor-pointer" : ""}
+              >
+                <Card
+                  className="hover:shadow-lg transition-all relative group"
+                  onDoubleClick={() => handleFolderClick(folder)}
+                >
+                  <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <MoreOptionsMenu
+                      itemId={folder.id}
+                      itemType="folder"
+                      itemName={folder.name}
+                      isFavorite={folder.isFavorite}
+                      onFavorite={() => handleToggleFavorite(folder.id, "folder")}
+                      onDelete={() => handleTrash(folder.id, "folder")}
+                      onRestore={() => handleRestore(folder.id, "folder")}
+                      onPermanentDelete={() =>
+                        handlePermanentDelete(folder.id, "folder")
+                      }
+                      allowedActions={actions}
+                    />
                   </div>
-                  <p className="text-xs text-gray-400 mb-2">
-                    Uploaded: {new Date(asset.createdAt).toLocaleDateString()}
-                  </p>
-                  {isSharedPage && asset.sharedByName && (
-                    <p className="text-xs text-gray-500 mb-2">
-                      Shared by: {asset.sharedByName} ({asset.sharedByEmail})
-                    </p>
-                  )}
-                  {asset.fileType.startsWith("image/") ? (
-                    <div
-                      onClick={() => setEnlargedAsset(asset)}
-                      className="cursor-zoom-in"
-                    >
-                      <Image
-                        src={asset.url}
-                        alt={asset.name}
-                        width={500}
-                        height={200}
-                        className="w-full h-40 object-cover rounded border hover:brightness-90 transition"
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">📁</span>
+                      <CardTitle className="truncate flex-1">
+                        {folder.name}
+                      </CardTitle>
+                      {folder.isFavorite && (
+                        <span className="text-yellow-500 text-sm">⭐</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Folder</p>
+                    {isSharedPage && folder.sharedByName && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Shared by: {folder.sharedByName} ({folder.sharedByEmail})
+                      </p>
+                    )}
+                    {folder.createdAt && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        Created: {new Date(folder.createdAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ASSETS SECTION */}
+      {assets.length > 0 && (
+        <div className="col-span-full">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Assets</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {assets.map((asset) => {
+              const IconComponent = getIconForAsset(asset);
+              const extension = asset.name.split(".").pop()?.toLowerCase() || "";
+              const bgColor = asset.fileType.startsWith("image/")
+                ? "bg-blue-50"
+                : "bg-gray-100";
+              const textColor = asset.fileType.startsWith("image/")
+                ? "text-blue-700"
+                : "text-gray-700";
+              const viewLink = asset.url;
+
+              return (
+                <motion.div
+                  key={asset.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="hover:shadow-lg transition-all relative group">
+                    <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <MoreOptionsMenu
+                        itemId={asset.id}
+                        itemType="asset"
+                        itemName={asset.name}
+                        isFavorite={asset.isFavorite}
+                        onFavorite={() => handleToggleFavorite(asset.id, "asset")}
+                        onDelete={() => handleTrash(asset.id, "asset")}
+                        onDownload={() => window.open(asset.url, "_blank")}
+                        onRestore={() => handleRestore(asset.id, "asset")}
+                        onPermanentDelete={() =>
+                          handlePermanentDelete(asset.id, "asset")
+                        }
+                        allowedActions={actions}
                       />
                     </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      {fileLabel}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-
-        {!loading && folders.length === 0 && assets.length === 0 && (
-          <div className="col-span-full text-center py-12">
-            <div className="text-6xl mb-4">📁</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {isTrashPage
-                ? "Trash is empty"
-                : isSharedPage
-                ? "No shared items"
-                : "No content found"}
-            </h3>
-            <p className="text-gray-500">
-              {isTrashPage
-                ? "You have no items in the trash."
-                : isSharedPage
-                ? "Nothing has been shared with you yet."
-                : "Upload some files or create new folders to get started."}
-            </p>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <IconComponent className="w-5 h-5 text-blue-500" />
+                        <CardTitle className="truncate flex-1">
+                          {asset.name}
+                        </CardTitle>
+                        {asset.isFavorite && (
+                          <span className="text-yellow-500 text-sm">⭐</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 mb-2">
+                        Uploaded: {new Date(asset.createdAt).toLocaleDateString()}
+                      </p>
+                      {isSharedPage && asset.sharedByName && (
+                        <p className="text-xs text-gray-500 mb-2">
+                          Shared by: {asset.sharedByName} ({asset.sharedByEmail})
+                        </p>
+                      )}
+                      <div
+                        className={`${bgColor} border rounded p-4 text-center cursor-pointer`}
+                        onClick={() => {
+                          if (asset.fileType.startsWith("image/")) {
+                            setEnlargedAsset(asset);
+                          } else {
+                            window.open(asset.url, "_blank");
+                          }
+                        }}
+                      >
+                        <span className={`text-4xl ${textColor}`}>
+                          <IconComponent />
+                        </span>
+                        <p className={`text-sm mt-2 truncate ${textColor}`}>
+                          {asset.name}
+                        </p>
+                        <span className="inline-block mt-1 rounded bg-gray-200 text-gray-700 text-xs px-2 py-1">
+                          .{extension}
+                        </span>
+                        <div className="mt-2 flex justify-center gap-2">
+                          <a
+                            href={viewLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:text-blue-700 underline text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View
+                          </a>
+                          <a
+                            href={asset.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            className="text-green-600 hover:text-green-800 underline text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Download
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* EMPTY STATE */}
+      {!loading && folders.length === 0 && assets.length === 0 && (
+        <div className="col-span-full text-center py-12">
+          <div className="text-6xl mb-4">📁</div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            {isTrashPage
+              ? "Trash is empty"
+              : isSharedPage
+              ? "No shared items"
+              : "No content found"}
+          </h3>
+          <p className="text-gray-500">
+            {isTrashPage
+              ? "You have no items in the trash."
+              : isSharedPage
+              ? "Nothing has been shared with you yet."
+              : "Upload some files or create new folders to get started."}
+          </p>
+        </div>
+      )}
 
       {/* IMAGE FULLSCREEN MODAL */}
       {enlargedAsset && enlargedAsset.fileType.startsWith("image/") && (
