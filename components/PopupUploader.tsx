@@ -135,15 +135,6 @@ export default function PopupUploader({
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
 
-              {file && (
-                <div className="p-3 bg-muted rounded-md border text-sm">
-                  <div className="font-medium">{file.name}</div>
-                  <div className="text-muted-foreground">
-                    {(file.size / (1024 * 1024)).toFixed(2)} MB
-                  </div>
-                </div>
-              )}
-
               <ButtonCardInput
                 label="Target Folder Name (optional)"
                 placeholder="Enter target folder name"
