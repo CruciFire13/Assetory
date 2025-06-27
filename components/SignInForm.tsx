@@ -9,7 +9,7 @@ import { z } from "zod";
 import { signInSchema } from "@/schemas/signInSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
@@ -58,18 +58,24 @@ export default function SignInForm() {
     }
   };
 
+  const cardStyle =
+    "backdrop-blur-md bg-white/10 border border-white/20 shadow-xl";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="flex justify-center items-center h-screen"
+      className="w-full max-w-md"
     >
-      <Card className="w-[400px]">
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
+      <div className={`rounded-xl px-6 py-6 ${cardStyle}`}>
+        <CardHeader className="text-center p-0 pb-2">
+          <CardTitle className="text-2xl font-bold text-white">
+            Sign In to Assetory
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="space-y-5 p-0">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
               type="text"
@@ -78,7 +84,7 @@ export default function SignInForm() {
               disabled={isSubmitting}
             />
             {errors.identifier && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-red-400">
                 {errors.identifier.message}
               </p>
             )}
@@ -90,10 +96,10 @@ export default function SignInForm() {
               disabled={isSubmitting}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-red-400">{errors.password.message}</p>
             )}
 
-            {authError && <p className="text-sm text-red-600">{authError}</p>}
+            {authError && <p className="text-sm text-red-500">{authError}</p>}
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? (
@@ -104,7 +110,7 @@ export default function SignInForm() {
             </Button>
           </form>
         </CardContent>
-      </Card>
+      </div>
     </motion.div>
   );
 }
