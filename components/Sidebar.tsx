@@ -14,6 +14,7 @@ import {
   Star,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import StorageUsage from "./StorageUsed";
 
 const navItems = [
   {
@@ -98,6 +99,10 @@ export const Sidebar = () => {
             </nav>
           </div>
         ))}
+
+        <div className="mt-auto border-t pt-4">
+          <StorageUsage />
+        </div>
       </motion.aside>
 
       {isOpen && !isDesktop && (
