@@ -17,6 +17,7 @@ export async function GET() {
             name: user.name,
             email: user.email,
             storageUsed: user.storageUsed,
+            image: user.profileImageUrl,
         }, {status: 200});
     } catch (err) {
         console.error("[USER_STORAGE_FETCH_ERROR]", err);
