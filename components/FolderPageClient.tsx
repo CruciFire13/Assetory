@@ -8,6 +8,9 @@ import PopupUploader from "@/components/PopupUploader";
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
 import SignOutClientButton from "@/components/SignOutClientButton";
+import LogoReveal from "@/components/LogoReveal";
+import { motion } from "framer-motion";
+import { ArrowLeftCircle } from "lucide-react";
 
 interface FolderPageClientProps {
   folderId: string;
@@ -23,6 +26,7 @@ interface FolderInfo {
 export default function FolderPageClient({ folderId }: FolderPageClientProps) {
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
+
   const [folderInfo, setFolderInfo] = useState<FolderInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +43,6 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
         setLoading(true);
         const res = await fetch(`/api/folders/contents/${folderId}`);
         if (!res.ok) throw new Error(await res.text());
-
         const data = await res.json();
         setFolderInfo(data);
         setError(null);
@@ -63,14 +66,12 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
 
   if (!isLoaded || loading) {
     return (
-      <div className="flex h-screen">
+      <div className="flex h-screen overflow-hidden bg-gradient-to-br from-[#2a0a0a] via-[#3f0d0d] to-black text-white">
         <Sidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
+        <div className="flex flex-col flex-1 min-h-0">
           <Navbar />
-          <main className="p-6 space-y-6 overflow-y-auto">
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
+          <main className="flex-1 flex items-center justify-center p-6">
+            <div className="animate-spin h-12 w-12 border-4 border-red-400 border-t-transparent rounded-full" />
           </main>
         </div>
       </div>
@@ -79,24 +80,27 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
 
   if (error) {
     return (
-      <div className="flex h-screen">
+      <div className="flex h-screen overflow-hidden bg-gradient-to-br from-[#2a0a0a] via-[#3f0d0d] to-black text-white">
         <Sidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
+        <div className="flex flex-col flex-1 min-h-0">
           <Navbar />
-          <main className="p-6 space-y-6 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto p-6 space-y-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">Folder Not Found</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-[#ff6666] via-[#fca5a5] to-[#ffe6e6] text-transparent bg-clip-text">
+                Folder Not Found
+              </h1>
               <SignOutClientButton />
             </div>
-            <div className="text-center py-12">
+            <div className="text-center py-16">
               <div className="text-6xl mb-4">❌</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{error}</h3>
-              <p className="text-gray-500 mb-4">
-                The folder you're looking for doesn't exist or you don't have access to it.
+              <h3 className="text-lg font-semibold mb-2">{error}</h3>
+              <p className="text-muted-foreground mb-4">
+                The folder doesn’t exist or you don’t have permission to access
+                it.
               </p>
               <button
                 onClick={() => router.push("/dashboard")}
-                className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary/90 transition-colors"
+                className="bg-red-600 hover:bg-red-700 transition-colors px-4 py-2 rounded-lg text-white shadow"
               >
                 Go to Dashboard
               </button>
@@ -108,41 +112,68 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
   }
 
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-[#2a0a0a] via-[#3f0d0d] to-black text-white font-sans relative overflow-hidden">
+      <div className="z-40 relative">
+        <Sidebar />
+      </div>
+
+      <div className="fixed top-0 left-0 right-0 z-30">
         <Navbar />
-        <main className="p-6 space-y-6 overflow-y-auto">
-          <div className="flex justify-between items-center">
+      </div>
+
+      <div className="pt-16 lg:ml-64 h-full flex flex-col relative z-20">
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <LogoReveal />
+        </div>
+
+        <main className="p-6 space-y-6 overflow-y-auto relative flex-1 z-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex justify-between items-center"
+          >
             <button
               onClick={handleGoBack}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center text-sm text-pink-200 hover:text-pink-100 transition"
             >
-              ← Back
+              <ArrowLeftCircle className="w-5 h-5 mr-1" />
+              Back
             </button>
             <SignOutClientButton />
-          </div>
+          </motion.div>
 
-          <div className="flex justify-between items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex justify-between items-center"
+          >
             <div>
-              <h2 className="text-xl font-semibold">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-[#ff8a8a] to-[#ffe6e6] bg-clip-text text-transparent">
                 {folderInfo?.name}
               </h2>
               {folderInfo?.createdAt && (
-                <p className="text-sm text-muted-foreground">
-                  Created: {new Date(folderInfo.createdAt).toLocaleDateString()}
+                <p className="text-sm text-white/60">
+                  Created on:{" "}
+                  {new Date(folderInfo.createdAt).toLocaleDateString()}
                 </p>
               )}
             </div>
-            <PopupUploader 
+
+            <PopupUploader
               defaultParentName={folderInfo?.name}
               key={folderId}
             />
-          </div>
+          </motion.div>
 
-          <AssetGrid
-            endpoint={`/api/folders/contents/${folderId}`}
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <AssetGrid endpoint={`/api/folders/contents/${folderId}`} />
+          </motion.div>
         </main>
       </div>
     </div>

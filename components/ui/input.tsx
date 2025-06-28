@@ -1,6 +1,5 @@
-import * as React from "react"
-
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -8,14 +7,23 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       type={type}
       data-slot="input"
       className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        "flex h-10 w-full rounded-md border border-pink-500/20 bg-white/5 px-3 py-2 text-sm text-white/90 shadow-md backdrop-blur-md transition-colors duration-200",
+
+        "placeholder:text-white/40 file:text-white/70 file:bg-transparent file:border-0 file:font-medium file:text-sm",
+
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+
+        "selection:bg-pink-500/70 selection:text-white",
+
+        "disabled:opacity-50 disabled:cursor-not-allowed",
+
+        "aria-invalid:ring-1 aria-invalid:ring-red-500/40",
+
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

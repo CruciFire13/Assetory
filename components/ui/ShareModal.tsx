@@ -45,7 +45,6 @@ export default function ShareModal({
       if (!res.ok) throw new Error("Failed to fetch shared users");
 
       const data = await res.json();
-
       setSharedWith(data.sharedWith || []);
     } catch (err: any) {
       toast.error(err.message || "Something went wrong fetching users.");
@@ -78,7 +77,6 @@ export default function ShareModal({
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || "Failed to share");
 
       toast.success(`Shared ${itemType} with ${email}`);
@@ -115,9 +113,11 @@ export default function ShareModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-[#2a0a0a]/60 backdrop-blur-md border border-red-800/30 text-white shadow-2xl rounded-xl">
         <DialogHeader>
-          <DialogTitle>Share {itemType}</DialogTitle>
+          <DialogTitle className="text-lg text-white">
+            Share {itemType}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-2 items-center">
@@ -125,24 +125,28 @@ export default function ShareModal({
             placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 bg-[#3a0a0a]/30 text-white placeholder:text-white/70 border border-red-800/20 rounded-xl shadow-inner backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
           />
-          <Button onClick={handleShare}>Share</Button>
+          <Button
+            onClick={handleShare}
+            className="bg-red-700 hover:bg-red-600 text-white rounded-xl"
+          >
+            Share
+          </Button>
         </div>
 
         <div className="mt-4">
-          <p className="text-sm font-medium mb-2">Shared With:</p>
+          <p className="text-sm font-medium text-white mb-2">Shared With:</p>
           {loading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-white/60">Loading...</p>
           ) : sharedWith.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No users shared yet.
-            </p>
+            <p className="text-sm text-white/60">No users shared yet.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-black/70 scrollbar-track-transparent pr-1">
               {sharedWith.map((user) => (
                 <li
                   key={user.id}
-                  className="flex justify-between items-center px-3 py-2 border rounded"
+                  className="flex justify-between items-center px-3 py-2 bg-[#3a0a0a]/30 backdrop-blur-md border border-red-800/20 rounded-xl text-white"
                 >
                   <div className="flex items-center gap-2">
                     {user.image && (
@@ -159,7 +163,7 @@ export default function ShareModal({
                         {user.name || user.email}
                       </span>
                       {user.name && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-white/60">
                           {user.email}
                         </span>
                       )}
@@ -169,6 +173,7 @@ export default function ShareModal({
                     size="sm"
                     variant="destructive"
                     onClick={() => handleUnshare(user.email)}
+                    className="text-xs"
                   >
                     Remove
                   </Button>

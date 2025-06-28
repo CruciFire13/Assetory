@@ -13,18 +13,21 @@ export const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50" />
+    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 top-1/2 left-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-lg focus:outline-none",
+        "fixed z-50 top-1/2 left-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
+        "rounded-xl bg-gradient-to-br from-[#3f0d0d] via-[#2a0a0a] to-black",
+        "text-white shadow-2xl border border-[#4d1c1c]",
+        "p-6 focus:outline-none",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none">
-        <X className="h-5 w-5 text-muted-foreground" />
+      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-md opacity-70 hover:opacity-100 transition-opacity focus:outline-none">
+        <X className="h-5 w-5 text-white" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
@@ -45,7 +48,7 @@ export const DialogTitle = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-xl font-semibold", className)}
+    className={cn("text-2xl font-bold text-white tracking-tight", className)}
     {...props}
   >
     {children}
@@ -59,7 +62,7 @@ export const DialogDescription = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-[#fca5a5]/90 leading-relaxed", className)}
     {...props}
   >
     {children}

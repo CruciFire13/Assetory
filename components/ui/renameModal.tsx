@@ -75,9 +75,11 @@ export default function RenameModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-[#2a0a0a]/60 backdrop-blur-md border border-red-800/30 text-white shadow-2xl rounded-xl">
         <DialogHeader>
-          <DialogTitle>Rename {itemType}</DialogTitle>
+          <DialogTitle className="text-lg text-white">
+            Rename {itemType}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-2 items-center mt-4">
@@ -85,6 +87,7 @@ export default function RenameModal({
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder={`Enter new ${itemType} name`}
+            className="w-full px-4 py-2 bg-[#3a0a0a]/30 text-white placeholder:text-white/70 border border-red-800/20 rounded-xl shadow-inner backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -92,7 +95,12 @@ export default function RenameModal({
               }
             }}
           />
-          <Button onClick={handleRename}>Enter</Button>
+          <Button
+            onClick={handleRename}
+            className="bg-red-700 hover:bg-red-600 text-white rounded-xl"
+          >
+            Enter
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

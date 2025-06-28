@@ -6,111 +6,118 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  FolderKanban,
+  Star,
   Share2,
   Trash2,
   Menu,
-  Grid3X3,
-  Star,
+  ChevronsLeft,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import StorageUsage from "./StorageUsed";
 
 const navItems = [
-  {
-    title: "Main",
-    items: [
-      { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-      { name: "Collections", path: "/collections", icon: FolderKanban },
-    ],
-  },
-  {
-    title: "Actions",
-    items: [
-      { name: "View Assets", path: "/#assets", icon: Grid3X3 },
-      { name: "Favourites", path: "/favourites", icon: Star },
-    ],
-  },
-  {
-    title: "Other",
-    items: [
-      { name: "Sharing", path: "/sharing", icon: Share2 },
-      { name: "Trash", path: "/trash", icon: Trash2 },
-    ],
-  },
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Favourites", path: "/favourites", icon: Star },
+  { name: "Sharing", path: "/sharing", icon: Share2 },
+  { name: "Trash", path: "/trash", icon: Trash2 },
 ];
 
 export const Sidebar = () => {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const toggleSidebar = () => {
+    if (isDesktop) {
+      setIsOpen(!isOpen);
+    } else {
+      setIsMobileOpen(!isMobileOpen);
+    }
+  };
+
+  const isSidebarVisible = isDesktop ? isOpen : isMobileOpen;
+
   return (
-    <div className="relative h-full">
-      {!isDesktop && (
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden p-2 m-2 rounded-md bg-gray-100 shadow fixed top-4 left-4 z-50"
-        >
-          <Menu className="h-6 w-6 text-gray-800" />
-        </button>
-      )}
+    <>
+      <button
+        onClick={toggleSidebar}
+        className="lg:block fixed z-50 top-4 left-4 bg-black/50 text-white p-2 rounded-md backdrop-blur-md shadow-md"
+      >
+        {isSidebarVisible ? (
+          <ChevronsLeft className="w-5 h-5" />
+        ) : (
+          <Menu className="w-5 h-5" />
+        )}
+      </button>
 
       <motion.aside
-        initial={{ x: -300 }}
-        animate={{ x: isOpen || isDesktop ? 0 : -300 }}
-        transition={{ duration: 0.25 }}
-        className={cn(
-          "fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r shadow-md p-6 space-y-6 flex flex-col",
-          "lg:relative lg:translate-x-0"
-        )}
+        initial={{ width: isDesktop ? 240 : 0 }}
+        animate={{ width: isSidebarVisible ? (isDesktop ? 240 : 220) : 64 }}
+        transition={{ duration: 0.3 }}
+        className="fixed top-0 left-0 z-40 h-screen border-r bg-black/30 text-white backdrop-blur-md shadow-xl overflow-hidden"
       >
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">DevAsset Hub</h2>
+        <div className="h-full flex flex-col p-4 space-y-8">
+          <motion.h2
+            className={cn(
+              "text-2xl font-bold text-center tracking-wider transition-all duration-300",
+              !isSidebarVisible && "opacity-0 scale-95"
+            )}
+          >
+            <span className="bg-gradient-to-r from-[#ff9999] via-[#ffcccc] to-white bg-clip-text text-transparent drop-shadow">
+              {isSidebarVisible ? "Navigation" : "N"}
+            </span>
+          </motion.h2>
 
-        {navItems.map((section) => (
-          <div key={section.title}>
-            <p className="text-xs text-gray-500 uppercase mb-2 px-4">
-              {section.title}
-            </p>
-            <nav className="space-y-1 mb-4">
-              {section.items.map(({ name, icon: Icon, path }) => (
-                <Link key={name} href={path} onClick={() => setIsOpen(false)}>
-                  <div
+          <nav className="flex flex-col gap-3">
+            {navItems.map(({ name, path, icon: Icon }) => {
+              const isActive = pathname === path;
+              return (
+                <Link
+                  key={name}
+                  href={path}
+                  onClick={() => setIsMobileOpen(false)}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05, x: 4 }}
+                    transition={{ type: "spring", stiffness: 200 }}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-all",
-                      pathname === path && "bg-gray-200 font-semibold"
+                      "flex items-center gap-4 px-4 py-3 rounded-lg font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-gradient-to-r from-[#ff6666]/70 to-[#ffcccc]/50 shadow-md"
+                        : "hover:bg-white/10",
+                      !isSidebarVisible && "justify-center px-2"
                     )}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span>{name}</span>
-                  </div>
+                    <Icon className="w-5 h-5" />
+                    {isSidebarVisible && (
+                      <span className="text-sm">{name}</span>
+                    )}
+                  </motion.div>
                 </Link>
-              ))}
-            </nav>
-          </div>
-        ))}
+              );
+            })}
+          </nav>
 
-        <div className="mt-auto border-t pt-4">
-          <StorageUsage />
+          <div className="mt-auto pt-4 border-t border-white/10">
+            {isSidebarVisible && <StorageUsage />}
+          </div>
         </div>
       </motion.aside>
 
-      {isOpen && !isDesktop && (
+      {isMobileOpen && !isDesktop && (
         <div
-          className="fixed inset-0 bg-black/30 z-30"
-          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          onClick={() => setIsMobileOpen(false)}
         />
       )}
-    </div>
+    </>
   );
 };

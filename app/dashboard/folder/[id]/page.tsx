@@ -9,7 +9,7 @@ interface FolderPageProps {
 }
 
 export default function FolderPage({ params }: FolderPageProps) {
-  const { id } = use(params); // unwraps the async `params`
+  const { id } = use(params);
 
   return <FolderPageClient folderId={id} />;
 }

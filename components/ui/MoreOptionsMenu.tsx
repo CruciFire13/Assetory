@@ -33,7 +33,14 @@ export default function MoreOptionsMenu({
   itemType,
   itemName,
   isFavorite,
-  allowedActions = ["favorite", "delete", "rename", "share", "open", "download"],
+  allowedActions = [
+    "favorite",
+    "delete",
+    "rename",
+    "share",
+    "open",
+    "download",
+  ],
   onRenamed,
 }: {
   onFavorite?: () => void;
@@ -79,67 +86,96 @@ export default function MoreOptionsMenu({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100">
-            <MoreVertical className="w-5 h-5 text-muted-foreground" />
+          <button className="absolute top-2 right-2 p-1 rounded-full bg-transparent hover:bg-white/10 transition-colors">
+            <MoreVertical className="w-5 h-5 text-white/70 hover:text-pink-400 transition-colors" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" asChild>
+
+        <DropdownMenuContent
+          align="end"
+          className="w-48 bg-[#1f1f1f] border border-pink-600/20 rounded-lg shadow-lg"
+          asChild
+        >
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
             {allowedActions.includes("favorite") && (
-              <DropdownMenuItem onClick={onFavorite}>
+              <DropdownMenuItem
+                onClick={onFavorite}
+                className="text-white/80 hover:bg-pink-600/20 hover:text-pink-400 cursor-pointer"
+              >
                 <Star className="w-4 h-4 mr-2" />
                 {isFavorite ? "Unfavorite" : "Favorite"}
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("delete") && (
-              <DropdownMenuItem onClick={onDelete}>
+              <DropdownMenuItem
+                onClick={onDelete}
+                className="text-white/80 hover:bg-pink-600/20 hover:text-pink-400 cursor-pointer"
+              >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Move to Trash
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("restore") && (
-              <DropdownMenuItem onClick={onRestore}>
+              <DropdownMenuItem
+                onClick={onRestore}
+                className="text-white/80 hover:bg-green-600/20 hover:text-green-400 cursor-pointer"
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Restore
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("permanentDelete") && (
-              <DropdownMenuItem onClick={onPermanentDelete}>
-                <Trash2 className="w-4 h-4 mr-2 text-red-500" />
+              <DropdownMenuItem
+                onClick={onPermanentDelete}
+                className="text-red-400 hover:bg-red-600/20 hover:text-red-300 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
                 Delete Permanently
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("share") && itemType === "asset" && (
-              <DropdownMenuItem onClick={() => setShowShareModal(true)}>
+              <DropdownMenuItem
+                onClick={() => setShowShareModal(true)}
+                className="text-white/80 hover:bg-blue-600/20 hover:text-blue-400 cursor-pointer"
+              >
                 <Share2 className="w-4 h-4 mr-2" />
                 Share via Email
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("rename") && (
-              <DropdownMenuItem onClick={() => setShowRenameModal(true)}>
+              <DropdownMenuItem
+                onClick={() => setShowRenameModal(true)}
+                className="text-white/80 hover:bg-yellow-600/20 hover:text-yellow-300 cursor-pointer"
+              >
                 <Pencil className="w-4 h-4 mr-2" />
                 Rename
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("open") && itemType === "folder" && (
-              <DropdownMenuItem onClick={handleOpen}>
+              <DropdownMenuItem
+                onClick={handleOpen}
+                className="text-white/80 hover:bg-purple-600/20 hover:text-purple-300 cursor-pointer"
+              >
                 <Eye className="w-4 h-4 mr-2" />
                 Open
               </DropdownMenuItem>
             )}
 
             {allowedActions.includes("download") && itemType === "asset" && (
-              <DropdownMenuItem onClick={handleDownload}>
+              <DropdownMenuItem
+                onClick={handleDownload}
+                className="text-white/80 hover:bg-cyan-600/20 hover:text-cyan-300 cursor-pointer"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Download
               </DropdownMenuItem>
@@ -148,6 +184,7 @@ export default function MoreOptionsMenu({
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Modals */}
       <ShareModal
         open={showShareModal}
         onClose={() => setShowShareModal(false)}

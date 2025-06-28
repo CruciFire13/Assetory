@@ -119,4 +119,24 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* ✅ Custom Black Scrollbar Styling */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: black transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: black;
+    border-radius: 9999px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }

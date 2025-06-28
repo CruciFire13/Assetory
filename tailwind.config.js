@@ -1,4 +1,8 @@
- @type {import('tailwindcss').Config}
+/* eslint-disable @typescript-eslint/no-require-imports */
+/** @type {import('tailwindcss').Config} */
+const animate = require("tailwindcss-animate");
+const scrollbar = require("tailwind-scrollbar");
+
 module.exports = {
   content: [
     "./app/**/*.{ts,tsx}",
@@ -8,5 +12,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate, scrollbar],
 };

@@ -13,6 +13,7 @@ import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import ButtonCardInput from "@/components/ui/ButtonCardInput";
+import { Loader2 } from "lucide-react";
 
 const MAX_FILE_SIZE_MB = 5;
 
@@ -43,7 +44,6 @@ export default function PopupUploader({
       return toast.error("File exceeds 5MB limit");
 
     setIsUploading(true);
-
     try {
       const token = await getToken();
       const formData = new FormData();
@@ -60,13 +60,14 @@ export default function PopupUploader({
       if (res.ok) {
         toast.success("File uploaded successfully!");
         setFile(null);
-        // Reset file input
-        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
+        const fileInput = document.querySelector(
+          'input[type="file"]'
+        ) as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
       } else {
         toast.error(data.error || "Upload failed");
       }
-    } catch (error) {
+    } catch {
       toast.error("Upload failed");
     } finally {
       setIsUploading(false);
@@ -77,7 +78,6 @@ export default function PopupUploader({
     if (!newFolderName.trim()) return toast.error("Folder name is required");
 
     setIsCreatingFolder(true);
-
     try {
       const token = await getToken();
       const res = await fetch("/api/folders/create", {
@@ -86,9 +86,9 @@ export default function PopupUploader({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ 
-          name: newFolderName.trim(), 
-          parentName: parentName || null 
+        body: JSON.stringify({
+          name: newFolderName.trim(),
+          parentName: parentName || null,
         }),
       });
 
@@ -99,7 +99,7 @@ export default function PopupUploader({
       } else {
         toast.error(data.error || "Error creating folder");
       }
-    } catch (error) {
+    } catch {
       toast.error("Error creating folder");
     } finally {
       setIsCreatingFolder(false);
@@ -108,12 +108,15 @@ export default function PopupUploader({
 
   return (
     <Dialog>
-      <DialogTrigger className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary/90 transition-colors">
+      <DialogTrigger className="bg-gradient-to-r from-[#7f1d1d] via-[#b91c1c] to-[#dc2626] hover:from-[#991b1b] hover:to-[#f87171] text-white px-4 py-2 rounded-md shadow transition-all font-semibold">
         + Add New
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+
+      <DialogContent className="max-w-md bg-zinc-900 text-white border border-zinc-700 shadow-lg">
         <DialogHeader>
-          <DialogTitle>Manage Assets</DialogTitle>
+          <DialogTitle className="text-white text-lg tracking-wide">
+            Manage Your Assets
+          </DialogTitle>
         </DialogHeader>
 
         <motion.div
@@ -122,12 +125,22 @@ export default function PopupUploader({
           transition={{ duration: 0.3 }}
         >
           <Tabs defaultValue="upload" className="mt-4">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="upload">Upload Asset</TabsTrigger>
-              <TabsTrigger value="folder">Create Folder</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-4 bg-zinc-800 text-white rounded-md">
+              <TabsTrigger
+                value="upload"
+                className="data-[state=active]:bg-red-600 data-[state=active]:text-white rounded-md transition"
+              >
+                Upload Asset
+              </TabsTrigger>
+              <TabsTrigger
+                value="folder"
+                className="data-[state=active]:bg-red-600 data-[state=active]:text-white rounded-md transition"
+              >
+                Create Folder
+              </TabsTrigger>
             </TabsList>
 
-            {/* Upload Asset Tab */}
+            {/* Upload Tab */}
             <TabsContent value="upload" className="space-y-4">
               <ButtonCardInput
                 label="Choose File"
@@ -136,8 +149,8 @@ export default function PopupUploader({
               />
 
               <ButtonCardInput
-                label="Target Folder Name (optional)"
-                placeholder="Enter target folder name"
+                label="Target Folder (optional)"
+                placeholder="Enter folder name"
                 value={targetFolderName}
                 onChange={(e) => setTargetFolderName(e.target.value)}
               />
@@ -145,24 +158,25 @@ export default function PopupUploader({
               <button
                 onClick={handleUpload}
                 disabled={!file || isUploading}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors text-white py-2 rounded shadow"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 rounded-md shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isUploading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isUploading ? "Uploading..." : "Upload"}
               </button>
             </TabsContent>
 
-            {/* Create Folder Tab */}
+            {/* Folder Tab */}
             <TabsContent value="folder" className="space-y-4">
               <ButtonCardInput
-                label="Folder Name"
+                label="New Folder Name"
                 placeholder="Enter folder name"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
               />
 
               <ButtonCardInput
-                label="Parent Folder Name (optional)"
-                placeholder="Enter parent folder name"
+                label="Parent Folder (optional)"
+                placeholder="Enter parent folder"
                 value={parentName}
                 onChange={(e) => setParentName(e.target.value)}
               />
@@ -170,8 +184,11 @@ export default function PopupUploader({
               <button
                 onClick={handleCreateFolder}
                 disabled={!newFolderName.trim() || isCreatingFolder}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors text-white py-2 rounded shadow"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white py-2 rounded-md shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isCreatingFolder && (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                )}
                 {isCreatingFolder ? "Creating..." : "Create Folder"}
               </button>
             </TabsContent>

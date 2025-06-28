@@ -4,13 +4,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import MoreOptionsMenu from "@/components/ui/MoreOptionsMenu";
 import { useRouter } from "next/navigation";
 
 import {
   FaJs,
-  FaReact,
   FaFilePdf,
   FaFileAlt,
   FaFileImage,
@@ -21,6 +18,9 @@ import {
 import { PiFileCppFill } from "react-icons/pi";
 import { SiTypescript, SiJson, SiPython } from "react-icons/si";
 import { IconType } from "react-icons";
+
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import MoreOptionsMenu from "@/components/ui/MoreOptionsMenu";
 
 interface Folder {
   id: string;
@@ -44,7 +44,6 @@ interface Asset {
 
 interface Props {
   endpoint: string;
-  showBreadcrumbs?: boolean;
   allowedActions?: Array<
     | "favorite"
     | "delete"
@@ -74,7 +73,6 @@ const AssetGrid = ({
   const defaultActions: Props["allowedActions"] = isTrashPage
     ? ["restore", "permanentDelete"]
     : ["favorite", "delete", "rename", "share", "open", "download"];
-
   const actions = allowedActions || defaultActions;
 
   const fetchContents = async () => {
@@ -93,6 +91,18 @@ const AssetGrid = ({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchContents();
+  }, [endpoint]);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setEnlargedAsset(null);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const handleToggleFavorite = async (id: string, type: "folder" | "asset") => {
     try {
@@ -155,44 +165,14 @@ const AssetGrid = ({
     }
   };
 
-  useEffect(() => {
-    fetchContents();
-  }, [endpoint]);
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setEnlargedAsset(null);
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <Card>
-              <CardContent className="p-4">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-              </CardContent>
-            </Card>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   const getIconForAsset = (asset: Asset): IconType => {
-    const extension = asset.name.split(".").pop()?.toLowerCase() || "";
+    const ext = asset.name.split(".").pop()?.toLowerCase() || "";
 
     if (asset.fileType.startsWith("image/")) return FaFileImage;
     if (asset.fileType.startsWith("video/")) return FaFileVideo;
     if (asset.fileType === "application/pdf") return FaFilePdf;
 
-    switch (extension) {
+    switch (ext) {
       case "js":
       case "jsx":
         return FaJs;
@@ -219,10 +199,11 @@ const AssetGrid = ({
 
   return (
     <>
-      {/* FOLDERS SECTION */}
       {folders.length > 0 && (
-        <div className="col-span-full mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Folders</h2>
+        <section className="mb-10">
+          <h2 className="text-xl font-semibold bg-gradient-to-r from-[#ff8a8a] to-[#ffe6e6] text-transparent bg-clip-text mb-4 drop-shadow-sm">
+            Folders
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {folders.map((folder) => (
               <motion.div
@@ -230,19 +211,20 @@ const AssetGrid = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className={actions.includes("open") ? "cursor-pointer" : ""}
               >
                 <Card
-                  className="hover:shadow-lg transition-all relative group"
                   onDoubleClick={() => handleFolderClick(folder)}
+                  className="relative group cursor-pointer hover:shadow-xl transition"
                 >
-                  <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                     <MoreOptionsMenu
                       itemId={folder.id}
                       itemType="folder"
                       itemName={folder.name}
                       isFavorite={folder.isFavorite}
-                      onFavorite={() => handleToggleFavorite(folder.id, "folder")}
+                      onFavorite={() =>
+                        handleToggleFavorite(folder.id, "folder")
+                      }
                       onDelete={() => handleTrash(folder.id, "folder")}
                       onRestore={() => handleRestore(folder.id, "folder")}
                       onPermanentDelete={() =>
@@ -252,24 +234,24 @@ const AssetGrid = ({
                     />
                   </div>
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2">
                       <span className="text-2xl">📁</span>
-                      <CardTitle className="truncate flex-1">
-                        {folder.name}
-                      </CardTitle>
+                      <CardTitle className="truncate">{folder.name}</CardTitle>
                       {folder.isFavorite && (
-                        <span className="text-yellow-500 text-sm">⭐</span>
+                        <span className="text-yellow-500">⭐</span>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">Folder</p>
-                    {isSharedPage && folder.sharedByName && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Shared by: {folder.sharedByName} ({folder.sharedByEmail})
-                      </p>
-                    )}
                     {folder.createdAt && (
                       <p className="text-xs text-gray-400 mt-1">
-                        Created: {new Date(folder.createdAt).toLocaleDateString()}
+                        Created:{" "}
+                        {new Date(folder.createdAt).toLocaleDateString()}
+                      </p>
+                    )}
+                    {isSharedPage && folder.sharedByName && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Shared by: {folder.sharedByName} ({folder.sharedByEmail}
+                        )
                       </p>
                     )}
                   </CardContent>
@@ -277,24 +259,20 @@ const AssetGrid = ({
               </motion.div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* ASSETS SECTION */}
       {assets.length > 0 && (
-        <div className="col-span-full">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Assets</h2>
+        <section>
+          <h2 className="text-xl font-semibold bg-gradient-to-r from-[#ff8a8a] to-[#ffe6e6] text-transparent bg-clip-text mb-4 drop-shadow-sm">
+            Assets
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {assets.map((asset) => {
-              const IconComponent = getIconForAsset(asset);
-              const extension = asset.name.split(".").pop()?.toLowerCase() || "";
-              const bgColor = asset.fileType.startsWith("image/")
-                ? "bg-blue-50"
-                : "bg-gray-100";
-              const textColor = asset.fileType.startsWith("image/")
-                ? "text-blue-700"
-                : "text-gray-700";
-              const viewLink = asset.url;
+              const Icon = getIconForAsset(asset);
+              const ext = asset.name.split(".").pop();
+              const isImage = asset.fileType.startsWith("image/");
 
               return (
                 <motion.div
@@ -303,14 +281,16 @@ const AssetGrid = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="hover:shadow-lg transition-all relative group">
-                    <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Card className="relative group hover:shadow-xl transition">
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                       <MoreOptionsMenu
                         itemId={asset.id}
                         itemType="asset"
                         itemName={asset.name}
                         isFavorite={asset.isFavorite}
-                        onFavorite={() => handleToggleFavorite(asset.id, "asset")}
+                        onFavorite={() =>
+                          handleToggleFavorite(asset.id, "asset")
+                        }
                         onDelete={() => handleTrash(asset.id, "asset")}
                         onDownload={() => window.open(asset.url, "_blank")}
                         onRestore={() => handleRestore(asset.id, "asset")}
@@ -322,57 +302,55 @@ const AssetGrid = ({
                     </div>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <IconComponent className="w-5 h-5 text-blue-500" />
+                        <Icon className="text-blue-600 w-5 h-5" />
                         <CardTitle className="truncate flex-1">
                           {asset.name}
                         </CardTitle>
                         {asset.isFavorite && (
-                          <span className="text-yellow-500 text-sm">⭐</span>
+                          <span className="text-yellow-500">⭐</span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mb-2">
-                        Uploaded: {new Date(asset.createdAt).toLocaleDateString()}
+                      <p className="text-xs text-gray-400">
+                        Uploaded:{" "}
+                        {new Date(asset.createdAt).toLocaleDateString()}
                       </p>
                       {isSharedPage && asset.sharedByName && (
-                        <p className="text-xs text-gray-500 mb-2">
-                          Shared by: {asset.sharedByName} ({asset.sharedByEmail})
+                        <p className="text-xs text-gray-500 mt-1">
+                          Shared by: {asset.sharedByName} ({asset.sharedByEmail}
+                          )
                         </p>
                       )}
                       <div
-                        className={`${bgColor} border rounded p-4 text-center cursor-pointer`}
-                        onClick={() => {
-                          if (asset.fileType.startsWith("image/")) {
-                            setEnlargedAsset(asset);
-                          } else {
-                            window.open(asset.url, "_blank");
-                          }
-                        }}
+                        className="mt-3 p-4 rounded border bg-gray-50 text-center cursor-pointer"
+                        onClick={() =>
+                          isImage
+                            ? setEnlargedAsset(asset)
+                            : window.open(asset.url, "_blank")
+                        }
                       >
-                        <span className={`text-4xl ${textColor}`}>
-                          <IconComponent />
-                        </span>
-                        <p className={`text-sm mt-2 truncate ${textColor}`}>
+                        <Icon className="text-4xl text-blue-500 mx-auto" />
+                        <p className="text-sm mt-2 truncate text-gray-700">
                           {asset.name}
                         </p>
-                        <span className="inline-block mt-1 rounded bg-gray-200 text-gray-700 text-xs px-2 py-1">
-                          .{extension}
+                        <span className="inline-block mt-1 text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
+                          .{ext}
                         </span>
-                        <div className="mt-2 flex justify-center gap-2">
+                        <div className="mt-2 flex justify-center gap-3">
                           <a
-                            href={viewLink}
+                            href={asset.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-700 underline text-sm"
+                            className="text-blue-600 text-sm hover:underline"
                             onClick={(e) => e.stopPropagation()}
                           >
                             View
                           </a>
                           <a
                             href={asset.url}
+                            download
                             target="_blank"
                             rel="noopener noreferrer"
-                            download
-                            className="text-green-600 hover:text-green-800 underline text-sm"
+                            className="text-green-600 text-sm hover:underline"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Download
@@ -385,14 +363,13 @@ const AssetGrid = ({
               );
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* EMPTY STATE */}
       {!loading && folders.length === 0 && assets.length === 0 && (
-        <div className="col-span-full text-center py-12">
-          <div className="text-6xl mb-4">📁</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="text-center mt-16">
+          <div className="text-6xl mb-4">🗃️</div>
+          <h3 className="text-xl font-semibold mb-2">
             {isTrashPage
               ? "Trash is empty"
               : isSharedPage
@@ -404,33 +381,34 @@ const AssetGrid = ({
               ? "You have no items in the trash."
               : isSharedPage
               ? "Nothing has been shared with you yet."
-              : "Upload some files or create new folders to get started."}
+              : "Upload files or create folders to get started."}
           </p>
         </div>
       )}
 
-      {/* IMAGE FULLSCREEN MODAL */}
       {enlargedAsset && enlargedAsset.fileType.startsWith("image/") && (
         <div
-          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-gradient-to-br from-red-900 via-red-800 to-red-700 bg-opacity-95"
           onClick={() => setEnlargedAsset(null)}
         >
           <div className="relative max-w-[90%] max-h-[90%]">
             <button
+              className="absolute top-2 right-2 text-white text-2xl hover:text-red-300"
               onClick={() => setEnlargedAsset(null)}
-              className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl"
             >
               ✕
             </button>
-            <img
+            <Image
               src={enlargedAsset.url}
               alt={enlargedAsset.name}
-              className="max-w-full max-h-full rounded shadow-xl"
+              width={1000}
+              height={1000}
+              className="max-w-full max-h-full rounded shadow-lg border border-white/20"
               onClick={(e) => e.stopPropagation()}
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 rounded-b">
+            <div className="absolute bottom-0 left-0 right-0 p-3 bg-black bg-opacity-60 text-white text-center rounded-b">
               <h3 className="font-medium">{enlargedAsset.name}</h3>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm">
                 {new Date(enlargedAsset.createdAt).toLocaleDateString()}
               </p>
             </div>
