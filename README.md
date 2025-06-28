@@ -1,57 +1,107 @@
-# DevAsset Hub
+# Assetory
 
-A modern, developer-focused resource hub for storing and managing all your essential digital assets — from icons to code snippets. Built using Next.js for both frontend and backend, with Clerk for authentication, NeonDB as the database, Drizzle ORM, and ImageKit for secure file storage.
+> **A Developer-Centric File & Asset Management Hub**
 
----
-
-## 🚀 Features
-
-- 🔐 User authentication via Clerk
-- 📁 Asset uploads (images, icons, code snippets)
-- ⭐ Starred items for quick access
-- 🗑️ Trash & restore functionality
-- ⚡ Fast uploads with ImageKit CDN
-- 📱 Responsive UI for mobile and desktop
+[🚀 Live Demo](YOUR_LIVE_LINK_HERE)
 
 ---
 
-## 🧱 Tech Stack
+👥 Contributors
 
-| Layer          | Tech                     |
-| -------------- | ------------------------ |
-| Frontend       | Next.js                  |
-| Backend        | Next.js API Routes       |
-| Authentication | [Clerk](clerk url )      |
-| Database       | Neon (PostgreSQL)        |
-| ORM            | Drizzle                  |
-| File Storage   | [ImageKit](imagekit url) |
-| Styling        | Tailwind CSS             |
+
+Poojan Shrestha — [GitHub](https://github.com/Poojan-Shrestha)
+
+Aryan Jha — [GitHub](https://github.com/CruciFire13)
 
 ---
 
-## 📦 Project Structure
+## ✨ Project Overview
 
-devasset-hub/
-│
-├── app/ # Next.js app directory
-├── components/ # Reusable UI components
-├── lib/ # Utility functions and API helpers
-├── db/ # Drizzle schema and migration scripts
-├── public/ # Static assets
-├── styles/ # Tailwind & global styles
-├── .env.local # Environment variables
-├── drizzle.config.ts # Drizzle config
-├── next.config.js # Next.js configuration
-└── package.json
+**Assetory** is a modern, secure, and developer-friendly digital asset hub designed to make file management seamless for developers and teams. Organize, preview, share, and manage your files, code snippets, images, documents, and more — all from your browser, with robust access controls and blazing-fast performance.
 
 ---
+
+## Why Assetory?
+
+- Developer-First Design: Built with developers in mind, supporting code files and technical documentation
+
+- Secure & Private: Enterprise-grade authentication and file security with Clerk
+
+- Collaborative: Share assets with team members via email with granular permissions
+
+- Fast & Reliable: Powered by Next.js 15 and ImageKit CDN for optimal performance
+
+---
+
+## 🗂️ Features
+
+✅ **User Authentication (Clerk)**  
+- Sign up / sign in  
+- Secure session handling  
+
+✅ **Folder Management**  
+- Create nested folders  
+- Rename folders  
+- Favorite / unfavorite folders  
+- Move folders to Trash, restore, or permanently delete  
+
+✅ **Asset Management**  
+- Upload diverse file types: images, PDFs, HTML, text, JSON, JS/TS(X), C++, and more  
+- Open or download for all file types  
+- Rename assets  
+- Favorite / unfavorite assets  
+- Move assets to Trash, restore, or permanently delete  
+
+✅ **Shared Access**  
+- Share assets with other users via email  
+- View shared users for each asset  
+- Revoke shared access at any time  
+
+✅ **Trash & Recovery**  
+- Soft-delete items into a “Trash” area  
+- Restore individual items  
+- Empty Trash completely (recursively deletes all trashed items)  
+
+✅ **Storage Quota Management**  
+- 2 GB storage limit per user  
+- 5 MB per-file upload limit  
+- Real-time usage display with visual warnings  
+
+✅ **Search & Browse**  
+- Browse folders and collections like “Sharing,” “Favorites,” and “Trash”  
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js 15, React, Tailwind CSS, Shadcn UI 
+- **Backend:** Next.js App Router API Routes  
+- **Database:** PostgreSQL (Neon), Drizzle ORM, Drizzle Kit migrations  
+- **Authentication:** Clerk  
+- **File Storage & CDN:** ImageKit  
+
+---
+
 
 ## 📸 Screenshots
 
 > _Add screenshots here after building the UI_
 
 ![Dashboard Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
-![Upload Interface](https://via.placeholder.com/1200x600?text=Upload+Assets)
+
+Main dashboard with folder structure and file management
+
+![Favourites Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+
+Favourites Page
+
+![Sharing Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+
+Sharing Page
+
+![Trash Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+
+Trash Page
 
 ---
 
@@ -63,46 +113,48 @@ devasset-hub/
 - Clerk account
 - Neon PostgreSQL database
 - ImageKit account
+---
 
-### Installation
+## 📦 Installation
 
-1. **Clone the repository:**
+Follow these steps to run the project locally:
 
-   ```bash
-   git clone https://github.com/yourusername/devasset-hub.git
-   cd devasset-hub
-   ```
+1. **Clone the repository**
 
-## Clerk Authentication
+```bash
+git clone https://github.com/<YOUR_USERNAME>/assetory.git
+cd assetory
 
+```
+2. **Install dependencies**
+
+```bash
+npm install
+```
+
+3. **Create environment variables:**
+
+Create a .env file in the root directory and fill in the following values:
+```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
 
-## ImageKit
+DATABASE_URL=your_neon_db_url
 
-NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
-IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
 NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=your_imagekit_url_endpoint
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
 
-## Clerk URLs
+```
 
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+4. **Run the development server**
 
-## Fallback URLs
+```bash
+npm run dev
+```
+Visit http://localhost:3000 to see your app running locally.
 
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
-
-## App URL
-
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-## Database - Neon PostgreSQL
-
-DATABASE_URL=your_neon_database_url
+----
 
 <!-- Set up your services:
 Create a Clerk account and get your API keys
@@ -110,12 +162,32 @@ Set up a Neon PostgreSQL database and copy your connection string
 Register with ImageKit and get your public/private keys -->
 
 🤝 Contributing
+
 Contributions are welcome! To contribute:
-1.Fork the project
-2.Create a new branch (git checkout -b feature/your-feature-name)
-3.Commit your changes (git commit -m 'Add some feature')
-4.Push to the branch (git push origin feature/your-feature-name)
-5.Open a pull request
+
+1. Fork the project
+
+2. Create a new branch:
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+3. Commit your changes:
+
+```bash
+git commit -m "Add some feature"
+```
+
+4. Push to your branch:
+
+```bash
+git push origin feature/your-feature-name
+```
+
+5. Open a pull request
+
+---
 
 📄 License
 This project is licensed under the MIT License.
@@ -124,7 +196,11 @@ This project is licensed under the MIT License.
 For feedback or questions, reach out via email@example.com or open an issue.
 
 🌐 Links
+
 🔗 Clerk
 🔗 NeonDB
 🔗 ImageKit
 🔗 Next.js
+
+⭐ Star this repository if you found it helpful!
+Built with ❤️ by Poojan Shrestha and Aryan Jha
