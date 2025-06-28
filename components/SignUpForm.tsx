@@ -77,8 +77,10 @@ export default function SignUpForm() {
         code: verificationCode,
       });
       if (res?.status === "complete") {
-        await setActive({ session: res.createdSessionId });
-        router.push("/dashboard");
+        if (setActive) {
+          await setActive({ session: res.createdSessionId });
+          router.push("/dashboard");
+        }
       }
     } catch {
       setVerificationError("Invalid or expired code.");
