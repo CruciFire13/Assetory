@@ -97,7 +97,6 @@ export default function DashboardPage() {
                   ? `/api/folders/contents/${currentFolderId}`
                   : `/api/folders/root`
               }
-              onFolderClick={handleFolderClick}
             />
           </motion.div>
         </main>

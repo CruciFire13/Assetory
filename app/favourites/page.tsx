@@ -13,7 +13,6 @@ import { motion } from "framer-motion";
 export default function FavouritesPage() {
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -60,9 +59,6 @@ export default function FavouritesPage() {
           >
             <AssetGrid
               endpoint="/api/favourite/index"
-              onFolderClick={(id: string, name: string) => {
-                setCurrentFolderId(id);
-              }}
             />
           </motion.div>
         </main>
