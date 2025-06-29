@@ -34,10 +34,8 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 backdrop-blur-md bg-black/30 border-b border-white/10 shadow-md">
-      {/* Left Spacer */}
       <div className="w-10" />
 
-      {/* Centered Logo */}
       {isClient && (
         <motion.h1
           animate={{ scale: [1, 1.04, 1] }}
@@ -53,7 +51,6 @@ export const Navbar = () => {
         </motion.h1>
       )}
 
-      {/* User Avatar */}
       {user && (
         <div className="relative">
           <button
@@ -86,9 +83,11 @@ export const Navbar = () => {
                     height={48}
                     className="rounded-full"
                   />
-                  <div>
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="text-sm text-zinc-400">{user.email}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{user.name}</p>
+                    <p className="text-sm text-zinc-400 break-words">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
 
