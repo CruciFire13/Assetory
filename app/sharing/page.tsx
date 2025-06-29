@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
-import SignOutClientButton from "@/components/SignOutClientButton";
+
 import AssetGrid from "@/components/AssetGrid";
 import { motion } from "framer-motion";
 
@@ -47,10 +47,8 @@ export default function SharedPage() {
             <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#ff9999] via-[#fca5a5] to-[#ffe6e6] text-transparent bg-clip-text drop-shadow">
               🔗 Items Shared With You
             </h1>
-            <SignOutClientButton />
           </motion.div>
 
-          {/* Asset Grid */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

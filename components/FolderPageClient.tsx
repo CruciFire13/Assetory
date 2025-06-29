@@ -7,7 +7,7 @@ import AssetGrid from "@/components/AssetGrid";
 import PopupUploader from "@/components/PopupUploader";
 import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
-import SignOutClientButton from "@/components/SignOutClientButton";
+
 import LogoReveal from "@/components/LogoReveal";
 import { motion } from "framer-motion";
 import { ArrowLeftCircle } from "lucide-react";
@@ -89,7 +89,6 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
               <h1 className="text-2xl font-bold bg-gradient-to-r from-[#ff6666] via-[#fca5a5] to-[#ffe6e6] text-transparent bg-clip-text">
                 Folder Not Found
               </h1>
-              <SignOutClientButton />
             </div>
             <div className="text-center py-16">
               <div className="text-6xl mb-4">❌</div>
@@ -140,7 +139,6 @@ export default function FolderPageClient({ folderId }: FolderPageClientProps) {
               <ArrowLeftCircle className="w-5 h-5 mr-1" />
               Back
             </button>
-            <SignOutClientButton />
           </motion.div>
 
           <motion.div

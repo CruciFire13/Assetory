@@ -8,7 +8,6 @@ import { Sidebar } from "@/components/Sidebar";
 import { Navbar } from "@/components/Navbar";
 import AssetGrid from "@/components/AssetGrid";
 import PopupUploader from "@/components/PopupUploader";
-import SignOutClientButton from "@/components/SignOutClientButton";
 import { motion } from "framer-motion";
 import LogoReveal from "@/components/LogoReveal";
 
@@ -63,8 +62,6 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-[#ff6666] via-[#fca5a5] to-[#ffe6e6] bg-clip-text text-transparent">
               Welcome to Your Dashboard
             </h1>
-
-            <SignOutClientButton />
           </motion.div>
 
           <motion.div

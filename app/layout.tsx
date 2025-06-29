@@ -17,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "devAsset hub",
-  description: "A developer asset hub for managing files and folders.",
+  title: "Assetory",
+  description:
+    "Assetory is a modern, secure, and developer-friendly digital asset hub designed to make file management seamless for developers and teams. Organize, preview, share, and manage your files, code snippets, images, documents, and more — all from your browser, with robust access controls and blazing-fast performance.",
 };
 
 export default function RootLayout({
