@@ -11,5 +11,5 @@ interface FolderPageProps {
 export default function FolderPage({ params }: FolderPageProps) {
   const { id } = use(params);
 
-  return <FolderPageClient folderId={id} />;
+  return <FolderPageClient folderId={id}  />;
 }
