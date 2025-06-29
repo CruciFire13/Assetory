@@ -83,8 +83,8 @@ export async function DELETE() {
     await db.update(users).set({ storageUsed: newStorage }).where(eq(users.id, userId));
 
     return NextResponse.json({ success: true, storageFreed: totalFreed }, { status: 200 });
-  } catch (error) {
-    console.error("[EMPTY_TRASH_ERROR]", error);
+  } catch (err) {
+    console.error("[EMPTY_TRASH_ERROR]", err);
     return NextResponse.json({ error: "Failed to empty trash" }, { status: 500 });
   }
 }
