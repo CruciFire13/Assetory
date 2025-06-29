@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { assets, users } from "@/lib/db/schema";
@@ -6,7 +6,6 @@ import { eq, sql } from "drizzle-orm";
 import { deleteFromImageKit } from "@/lib/imagekit";
 
 export async function DELETE(
-  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -40,8 +39,8 @@ export async function DELETE(
     .where(eq(users.id, userId));
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (err) {
-    console.error("[DELETE_ASSET_ERROR]", err);
+  } catch (error) {
+    console.error("[DELETE_ASSET_ERROR]", error);
     return NextResponse.json({ error: "Failed to delete asset" }, { status: 500 });
   }
 }

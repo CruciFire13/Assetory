@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { assets, folders } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(
-  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

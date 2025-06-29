@@ -30,7 +30,7 @@ async function deleteTrashedFolder(folderId: string, userId: string): Promise<nu
         await deleteFromImageKit(asset.fileId);
       }
     } catch (err) {
-      console.warn(`[ImageKit Delete Failed] ${asset.name}`);
+      console.warn(`[ImageKit Delete Failed] ${asset.name}`, err);
     }
   }
 
@@ -60,7 +60,7 @@ export async function DELETE() {
           await deleteFromImageKit(asset.fileId);
         }
       } catch (err) {
-        console.warn(`[ImageKit Delete Failed] ${asset.name}`);
+        console.warn(`[ImageKit Delete Failed] ${asset.name}`, err);
       }
     }
 

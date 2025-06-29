@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { folders, assets, users } from "@/lib/db/schema";
@@ -6,7 +6,6 @@ import { eq, and, sql } from "drizzle-orm";
 import { deleteFromImageKit } from "@/lib/imagekit";
 
 export async function DELETE(
-  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -44,7 +43,7 @@ export async function DELETE(
             await deleteFromImageKit(asset.fileId);
           }
         } catch (err) {
-          console.warn(`[ImageKit Delete Failed] ${asset.name}`);
+          console.warn(`[ImageKit Delete Failed] ${asset.name}`, err);
         }
 
         // Add to total storage freed
