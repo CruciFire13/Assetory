@@ -24,7 +24,9 @@ export async function DELETE(
       const childFolders = await db
         .select()
         .from(folders)
-        .where(and(eq(folders.parentId, id), eq(folders.userId, userId as string)));
+        .where(
+          and(eq(folders.parentId, id), eq(folders.userId, userId as string))
+        );
 
       // 2. Recursively delete children first
       for (const child of childFolders) {
@@ -35,7 +37,9 @@ export async function DELETE(
       const folderAssets = await db
         .select()
         .from(assets)
-        .where(and(eq(assets.folderId, id), eq(assets.userId, userId as string)));
+        .where(
+          and(eq(assets.folderId, id), eq(assets.userId, userId as string))
+        );
 
       for (const asset of folderAssets) {
         try {
@@ -53,7 +57,9 @@ export async function DELETE(
       // 4. Delete assets from DB
       await db
         .delete(assets)
-        .where(and(eq(assets.folderId, id), eq(assets.userId, userId as string)));
+        .where(
+          and(eq(assets.folderId, id), eq(assets.userId, userId as string))
+        );
 
       // 5. Delete this folder
       await db
@@ -76,15 +82,18 @@ export async function DELETE(
 
     // Subtract freed storage from user's used storage
     await db
-    .update(users)
-    .set({
-        storageUsed: sql`GREATEST(${users.storageUsed} - ${storageFreed}, 0)`
-    })
-    .where(eq(users.id, userId));
+      .update(users)
+      .set({
+        storageUsed: sql`GREATEST(${users.storageUsed} - ${storageFreed}, 0)`,
+      })
+      .where(eq(users.id, userId));
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
     console.error("[RECURSIVE_FOLDER_DELETE_ERROR]", err);
-    return NextResponse.json({ error: "Failed to delete folder" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete folder" },
+      { status: 500 }
+    );
   }
 }

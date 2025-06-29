@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -34,7 +34,7 @@ export default function ShareModal({
   const [sharedWith, setSharedWith] = useState<SharedUser[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchSharedUsers = async () => {
+  const fetchSharedUsers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -46,18 +46,22 @@ export default function ShareModal({
 
       const data = await res.json();
       setSharedWith(data.sharedWith || []);
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong fetching users.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Something went wrong fetching users.");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [itemType, itemId]);
 
   useEffect(() => {
     if (open) {
       fetchSharedUsers();
     }
-  }, [open, itemId, itemType]);
+  }, [open, fetchSharedUsers]);
 
   const handleShare = async () => {
     if (!email) return toast.error("Please enter a valid email");
@@ -82,8 +86,12 @@ export default function ShareModal({
       toast.success(`Shared ${itemType} with ${email}`);
       setEmail("");
       fetchSharedUsers();
-    } catch (err: any) {
-      toast.error(err.message || "Error sharing item");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Error sharing item");
+      }
     }
   };
 
@@ -106,8 +114,12 @@ export default function ShareModal({
 
       toast.success(`Unshared ${emailToRemove}`);
       fetchSharedUsers();
-    } catch (err: any) {
-      toast.error(err.message || "Error unsharing item");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Error unsharing item");
+      }
     }
   };
 
@@ -158,12 +170,12 @@ export default function ShareModal({
                         className="rounded-full"
                       />
                     )}
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm">
+                    <div className="flex flex-col max-w-[160px]">
+                      <span className="font-medium text-sm truncate">
                         {user.name || user.email}
                       </span>
                       {user.name && (
-                        <span className="text-xs text-white/60">
+                        <span className="text-xs text-white/60 truncate">
                           {user.email}
                         </span>
                       )}

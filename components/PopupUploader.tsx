@@ -140,7 +140,6 @@ export default function PopupUploader({
               </TabsTrigger>
             </TabsList>
 
-            {/* Upload Tab */}
             <TabsContent value="upload" className="space-y-4">
               <ButtonCardInput
                 label="Choose File"
@@ -165,7 +164,6 @@ export default function PopupUploader({
               </button>
             </TabsContent>
 
-            {/* Folder Tab */}
             <TabsContent value="folder" className="space-y-4">
               <ButtonCardInput
                 label="New Folder Name"

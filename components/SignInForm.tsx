@@ -53,7 +53,6 @@ export default function SignInForm() {
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
-        
       } else {
         toast.error("An error occurred during sign-in.");
       }

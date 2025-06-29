@@ -20,7 +20,8 @@ export default function SignUpForm() {
     password: "",
     passwordConfirmation: "",
   });
-  const [errors, setErrors] = useState<any>({});
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
@@ -31,28 +32,32 @@ export default function SignUpForm() {
   const [isResending, setIsResending] = useState(false);
 
   const validateForm = () => {
-    const newErrors: any = {};
+    const newErrors: { [key: string]: string } = {};
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
-    if (!/^\S+@\S+\.\S+$/.test(formData.email))
-      newErrors.email = "Invalid email";
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email))
+      newErrors.email = "Invalid email format";
+
     if (!formData.password) newErrors.password = "Password required";
-    if (formData.password.length < 8)
+    else if (formData.password.length < 8)
       newErrors.password = "Minimum 8 characters";
+
     if (formData.password !== formData.passwordConfirmation)
       newErrors.passwordConfirmation = "Passwords don't match";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
+
     try {
       setIsSubmitting(true);
       await signUp?.create({
@@ -60,22 +65,27 @@ export default function SignUpForm() {
         password: formData.password,
         firstName: formData.name,
       });
+
       await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
       setVerifying(true);
-    } catch (err: any) {
-      setAuthError(err.errors?.[0]?.message || "Sign-up failed");
-    } finally {
-      setIsSubmitting(false);
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null && "errors" in err) {
+        const errorObject = err as { errors: { message: string }[] };
+        setAuthError(errorObject.errors?.[0]?.message || "Sign-up failed");
+      } else {
+        setAuthError("Sign-up failed");
+      }
     }
   };
 
-  const handleVerify = async (e: any) => {
+  const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
       const res = await signUp?.attemptEmailAddressVerification({
         code: verificationCode,
       });
+
       if (res?.status === "complete") {
         if (setActive) {
           await setActive({ session: res.createdSessionId });

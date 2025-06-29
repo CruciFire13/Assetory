@@ -68,8 +68,12 @@ export default function RenameModal({
       toast.success(`${itemType} renamed successfully!`);
       onRenamed();
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong.");
+      }
     }
   };
 
