@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SignInForm() {
   const router = useRouter();
@@ -49,10 +50,13 @@ export default function SignInForm() {
       } else {
         setAuthError("Sign-in could not be completed. Please try again.");
       }
-    } catch (error: any) {
-      setAuthError(
-        error.errors?.[0]?.message || "An error occurred during sign-in."
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+        
+      } else {
+        toast.error("An error occurred during sign-in.");
+      }
     } finally {
       setIsSubmitting(false);
     }
