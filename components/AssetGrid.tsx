@@ -66,26 +66,28 @@ const AssetGrid = ({
 }: Props) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [enlargedAsset, setEnlargedAsset] = useState<Asset | null>(null);
   const router = useRouter();
 
   const defaultActions: Props["allowedActions"] = isTrashPage
     ? ["restore", "permanentDelete"]
     : ["favorite", "delete", "rename", "share", "open", "download"];
+
   const actions = allowedActions || defaultActions;
 
   const fetchContents = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const res = await fetch(endpoint);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load contents");
 
-      setFolders(data.folders || []);
-      setAssets(data.assets || []);
+      if (!res.ok) throw new Error(data?.error || "Failed to load contents");
+
+      setFolders(data?.folders || []);
+      setAssets(data?.assets || []);
     } catch (error) {
-      console.error(error);
+      console.error("Fetch error:", error);
       toast.error("Failed to load folder contents");
     } finally {
       setLoading(false);
@@ -104,58 +106,21 @@ const AssetGrid = ({
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  const handleToggleFavorite = async (id: string, type: "folder" | "asset") => {
-    try {
-      const res = await fetch(`/api/${type}s/favourite/${id}`, {
-        method: "PATCH",
-      });
-      if (!res.ok) throw new Error();
-      toast.success(`${type === "folder" ? "Folder" : "Asset"} updated`);
-      fetchContents();
-    } catch {
-      toast.error("Failed to update favorite status");
-    }
-  };
-
-  const handleTrash = async (id: string, type: "folder" | "asset") => {
-    try {
-      const res = await fetch(`/api/${type}s/trash/${id}`, {
-        method: "PATCH",
-      });
-      if (!res.ok) throw new Error();
-      toast.success(`${type} moved to trash`);
-      fetchContents();
-    } catch {
-      toast.error("Failed to move to trash");
-    }
-  };
-
-  const handleRestore = async (id: string, type: "folder" | "asset") => {
-    try {
-      const res = await fetch(`/api/${type}s/trash/${id}`, {
-        method: "PATCH",
-      });
-      if (!res.ok) throw new Error();
-      toast.success(`${type} restored`);
-      fetchContents();
-    } catch {
-      toast.error("Failed to restore item");
-    }
-  };
-
-  const handlePermanentDelete = async (
+  const handleAction = async (
     id: string,
-    type: "folder" | "asset"
+    type: "folder" | "asset",
+    action: "favourite" | "trash" | "restore" | "permanent-delete"
   ) => {
     try {
-      const res = await fetch(`/api/${type}s/permanent-delete/${id}`, {
-        method: "DELETE",
-      });
+      const method = action === "permanent-delete" ? "DELETE" : "PATCH";
+      const res = await fetch(`/api/${type}s/${action}/${id}`, { method });
+
       if (!res.ok) throw new Error();
-      toast.success(`${type} permanently deleted`);
+
+      toast.success(`${type} ${action.replace("-", " ")} successful`);
       fetchContents();
     } catch {
-      toast.error("Failed to delete permanently");
+      toast.error(`Failed to ${action.replace("-", " ")} ${type}`);
     }
   };
 
@@ -167,7 +132,6 @@ const AssetGrid = ({
 
   const getIconForAsset = (asset: Asset): IconType => {
     const ext = asset.name.split(".").pop()?.toLowerCase() || "";
-
     if (asset.fileType.startsWith("image/")) return FaFileImage;
     if (asset.fileType.startsWith("video/")) return FaFileVideo;
     if (asset.fileType === "application/pdf") return FaFilePdf;
@@ -199,6 +163,7 @@ const AssetGrid = ({
 
   return (
     <>
+      {/* === Folders === */}
       {folders.length > 0 && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold bg-gradient-to-r from-[#ff8a8a] to-[#ffe6e6] text-transparent bg-clip-text mb-4 drop-shadow-sm">
@@ -223,12 +188,16 @@ const AssetGrid = ({
                       itemName={folder.name}
                       isFavorite={folder.isFavorite}
                       onFavorite={() =>
-                        handleToggleFavorite(folder.id, "folder")
+                        handleAction(folder.id, "folder", "favourite")
                       }
-                      onDelete={() => handleTrash(folder.id, "folder")}
-                      onRestore={() => handleRestore(folder.id, "folder")}
+                      onDelete={() =>
+                        handleAction(folder.id, "folder", "trash")
+                      }
+                      onRestore={() =>
+                        handleAction(folder.id, "folder", "restore")
+                      }
                       onPermanentDelete={() =>
-                        handlePermanentDelete(folder.id, "folder")
+                        handleAction(folder.id, "folder", "permanent-delete")
                       }
                       allowedActions={actions}
                     />
@@ -262,12 +231,12 @@ const AssetGrid = ({
         </section>
       )}
 
+      {/* === Assets === */}
       {assets.length > 0 && (
         <section>
           <h2 className="text-xl font-semibold bg-gradient-to-r from-[#ff8a8a] to-[#ffe6e6] text-transparent bg-clip-text mb-4 drop-shadow-sm">
             Assets
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {assets.map((asset) => {
               const Icon = getIconForAsset(asset);
@@ -289,14 +258,18 @@ const AssetGrid = ({
                         itemName={asset.name}
                         isFavorite={asset.isFavorite}
                         onFavorite={() =>
-                          handleToggleFavorite(asset.id, "asset")
+                          handleAction(asset.id, "asset", "favourite")
                         }
-                        onDelete={() => handleTrash(asset.id, "asset")}
-                        onDownload={() => window.open(asset.url, "_blank")}
-                        onRestore={() => handleRestore(asset.id, "asset")}
+                        onDelete={() =>
+                          handleAction(asset.id, "asset", "trash")
+                        }
+                        onRestore={() =>
+                          handleAction(asset.id, "asset", "restore")
+                        }
                         onPermanentDelete={() =>
-                          handlePermanentDelete(asset.id, "asset")
+                          handleAction(asset.id, "asset", "permanent-delete")
                         }
+                        onDownload={() => window.open(asset.url, "_blank")}
                         allowedActions={actions}
                       />
                     </div>
@@ -366,6 +339,7 @@ const AssetGrid = ({
         </section>
       )}
 
+      {/* === Empty State === */}
       {!loading && folders.length === 0 && assets.length === 0 && (
         <div className="text-center mt-16">
           <div className="text-6xl mb-4">🗃️</div>
@@ -386,6 +360,7 @@ const AssetGrid = ({
         </div>
       )}
 
+      {/* === Fullscreen Image View === */}
       {enlargedAsset && enlargedAsset.fileType.startsWith("image/") && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-gradient-to-br from-red-900 via-red-800 to-red-700 bg-opacity-95"
