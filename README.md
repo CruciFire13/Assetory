@@ -2,7 +2,7 @@
 
 > **A Developer-Centric File & Asset Management Hub**
 
-[🚀 Live Demo](YOUR_LIVE_LINK_HERE)
+[🚀 Live Demo](https://assetory-one.vercel.app/)
 
 ---
 
@@ -85,21 +85,19 @@ Aryan Jha — [GitHub](https://github.com/CruciFire13)
 
 ## 📸 Screenshots
 
-> _Add screenshots here after building the UI_
-
-![Dashboard Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+![Dashboard Preview](images/Dashboard.png)
 
 Main dashboard with folder structure and file management
 
-![Favourites Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+![Favourites Preview](images/Favourites.png)
 
 Favourites Page
 
-![Sharing Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+![Sharing Preview](images/Sharing.png)
 
 Sharing Page
 
-![Trash Preview](https://via.placeholder.com/1200x600?text=Dashboard+Screenshot)
+![Trash Preview](images/Trash.png)
 
 Trash Page
 
