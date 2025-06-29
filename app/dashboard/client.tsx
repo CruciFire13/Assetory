@@ -15,19 +15,14 @@ export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
 
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [currentFolderName, setCurrentFolderName] = useState<string>("");
+  const [currentFolderId] = useState<string | null>(null);
+  const [currentFolderName] = useState<string>("");
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
     }
   }, [isLoaded, isSignedIn, router]);
-
-  const handleFolderClick = (folderId: string, folderName: string) => {
-    setCurrentFolderId(folderId);
-    setCurrentFolderName(folderName);
-  };
 
   if (!isLoaded) {
     return (
