@@ -87,7 +87,7 @@ Aryan Jha — [GitHub](https://github.com/CruciFire13)
 
 ![Dashboard Preview](images/Dashboard.png)
 
-Main dashboard with folder structure and file management
+Dashboard Page
 
 ![Favourites Preview](images/Favourites.png)
 
