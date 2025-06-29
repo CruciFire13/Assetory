@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { folders } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function PATCH(
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
