@@ -75,6 +75,8 @@ export default function SignUpForm() {
       } else {
         setAuthError("Sign-up failed");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
