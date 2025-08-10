@@ -191,7 +191,7 @@ git push origin feature/your-feature-name
 This project is licensed under the MIT License.
 
 📬 Contact
-For feedback or questions, reach out via email@example.com or open an issue.
+For feedback or questions, reach out via email or open an issue.
 
 🌐 Links
 
